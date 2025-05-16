@@ -1,10 +1,8 @@
 package com.dao.nbti.user.domain.aggregate;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,6 +12,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 @Entity
 public class User {
     @Id
@@ -22,12 +21,18 @@ public class User {
     private String accountId;
     private String password;
     private String name;
+    @Enumerated(EnumType.STRING)
     private Gender gender;
     private LocalDate birthdate;
-    private int point;
-    private String aiText;
+    private int point = 0;
+    private String aiText=null;
     @Enumerated(EnumType.STRING)
-    private Authority authority;
-    private char isDeleted;
-    private LocalDateTime deletedAt;
+    private Authority authority = Authority.USER;
+    @Enumerated(EnumType.STRING)
+    private IsDeleted isDeleted = IsDeleted.N;
+    private LocalDateTime deletedAt = LocalDateTime.now();
+
+    public void setEncodedPassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
 }
