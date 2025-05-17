@@ -30,7 +30,7 @@ public class User {
     private Authority authority = Authority.USER;
     @Enumerated(EnumType.STRING)
     private IsDeleted isDeleted = IsDeleted.N;
-    private LocalDateTime deletedAt = LocalDateTime.now();
+    private LocalDateTime deletedAt =null;
 
     public void setEncodedPassword(String encodedPassword) {
         this.password = encodedPassword;
