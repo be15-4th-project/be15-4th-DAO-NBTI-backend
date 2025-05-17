@@ -17,7 +17,7 @@ public class TestProblem {
     private int testProblemId;
     
     @Column(name = "test_result_id")
-    private int testResultId;
+    private Integer testResultId;
 
     @Column(name = "problem_id")
     private int problemId;
