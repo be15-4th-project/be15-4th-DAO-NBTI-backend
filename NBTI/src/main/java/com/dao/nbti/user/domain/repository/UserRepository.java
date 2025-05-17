@@ -10,4 +10,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     Optional<User> findByAccountId(String accountId);
 
+    Optional<User> findByAccountIdAndDeletedAtIsNull(String accountId);
+
 }
