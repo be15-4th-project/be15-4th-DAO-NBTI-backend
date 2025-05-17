@@ -1,5 +1,6 @@
 package com.dao.nbti.common.auth.application.dto;
 
+import com.dao.nbti.user.domain.aggregate.Authority;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -8,6 +9,5 @@ import lombok.Getter;
 public class LoginResponse {
     private String accessToken;
     private String refreshToken;
-    private String role;
-    private int userId;
+    private Authority authority;
 }
