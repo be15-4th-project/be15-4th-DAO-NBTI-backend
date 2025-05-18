@@ -17,7 +17,7 @@ public class StudyResult {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int studyResultId;
 
-    private int studyId;
+    private Integer studyId;
 
     private int problemId;
 

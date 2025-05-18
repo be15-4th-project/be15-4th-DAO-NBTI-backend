@@ -19,7 +19,7 @@ public class Study {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int studyId;
 
-    private int userId;
+    private Integer userId;
 
     private LocalDateTime createdAt;
 }
