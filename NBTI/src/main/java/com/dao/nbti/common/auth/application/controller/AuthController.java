@@ -4,10 +4,13 @@ import com.dao.nbti.common.auth.application.dto.LoginRequest;
 import com.dao.nbti.common.auth.application.dto.LoginResponse;
 import com.dao.nbti.common.auth.application.service.AuthService;
 import com.dao.nbti.common.dto.ApiResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,10 +18,11 @@ import java.time.Duration;
 
 @RestController
 @RequestMapping("/user")
+@RequiredArgsConstructor
 public class AuthController {
-    private AuthService authService;
+    private final AuthService authService;
     @GetMapping("/login")
-    public ResponseEntity<ApiResponse<LoginResponse>> login(LoginRequest loginRequest){
+    public ResponseEntity<ApiResponse<LoginResponse>> login(@RequestBody LoginRequest loginRequest){
         LoginResponse response = authService.login(loginRequest);
         ResponseCookie cookie = createRefreshTokenCookie(response.getRefreshToken());
         return ResponseEntity.ok()
