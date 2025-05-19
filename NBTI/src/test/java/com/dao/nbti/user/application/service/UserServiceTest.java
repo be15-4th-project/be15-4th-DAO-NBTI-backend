@@ -94,7 +94,7 @@ class UserServiceTest {
     }
 
     @Test
-    void deleteUser_USER_NOT_FOUND(){
+    void deleteUser_userNotFound(){
         when(userRepository.findByUserIdAndDeletedAtIsNull(userId)).thenReturn(Optional.empty());
 
         assertThrows(UserException.class ,()-> userService.deleteUser(userId));
