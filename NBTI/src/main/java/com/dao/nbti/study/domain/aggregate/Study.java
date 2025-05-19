@@ -21,5 +21,6 @@ public class Study {
 
     private Integer userId;
 
+    @Column(insertable = false)
     private LocalDateTime createdAt;
 }
