@@ -13,7 +13,7 @@ public enum ErrorCode {
     USER_NOT_FOUND("10002","존재하지 않는 사용자입니다.",HttpStatus.NOT_FOUND),
     INVALID_CREDENTIALS("10003", "올바르지 않은 아이디 혹은 비밀번호입니다.", HttpStatus.UNAUTHORIZED),
 
-    // 문제 오류 (30000~39999
+    // 문제 오류 (30000~39999)
     PROBLEM_NOT_FOUND("30001", "존재하지 않는 문제입니다.", HttpStatus.NOT_FOUND),
     CATEGORY_NOT_FOUND("30002", "존재하지 않는 카테고리입니다." , HttpStatus.NOT_FOUND ),
 
