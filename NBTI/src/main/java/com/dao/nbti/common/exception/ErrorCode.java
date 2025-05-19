@@ -17,6 +17,7 @@ public enum ErrorCode {
     CATEGORY_NOT_FOUND("20001", "존재하지 않는 카테고리입니다.", HttpStatus.NOT_FOUND),
     ANSWER_TYPE_NOT_FOUND("20002", "존재하지 않는 답안 유형입니다.", HttpStatus.NOT_FOUND),
     PROBLEM_NOT_FOUND("20003", "해당하는 조건의 문제가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
+    PARENT_CATEGORY_NOT_FOUND("20004", "상위 분야를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 
     // 검사 결과 오류 (30000 ~ 39999)
     TEST_RESULT_NOT_FOUND("30001", "검사 결과를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),

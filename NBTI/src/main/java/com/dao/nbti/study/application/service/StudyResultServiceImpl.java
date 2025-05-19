@@ -1,11 +1,13 @@
 package com.dao.nbti.study.application.service;
 
+import com.dao.nbti.common.exception.ErrorCode;
 import com.dao.nbti.study.application.dto.request.StudySearchCondition;
 import com.dao.nbti.study.application.dto.response.StudySummaryResponse;
 import com.dao.nbti.study.domain.aggregate.IsCorrect;
 import com.dao.nbti.study.domain.aggregate.Study;
 import com.dao.nbti.study.domain.repository.StudyRepository;
 import com.dao.nbti.study.domain.repository.StudyResultRepository;
+import com.dao.nbti.study.exception.StudyException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,13 +34,15 @@ public class StudyResultServiceImpl implements StudyResultService {
         return results.map(study -> {
             int studyId = study.getStudyId();
 
-            // 정답 수 및 전체 수 계산
             int totalCount = studyResultRepository.countByStudyId(studyId);
             int correctCount = studyResultRepository.countByStudyIdAndIsCorrect(studyId, IsCorrect.Y);
 
-            // studyId 기준 상위 카테고리 이름 조회
             List<String> parentCategories = studyResultRepository.findAllParentCategoryNamesByStudyId(studyId);
-            String parentCategoryName = parentCategories.isEmpty() ? "" : parentCategories.get(0);
+            if (parentCategories.isEmpty()) {
+                throw new StudyException(ErrorCode.PARENT_CATEGORY_NOT_FOUND);
+            }
+
+            String parentCategoryName = parentCategories.get(0);
 
             return StudySummaryResponse.builder()
                     .studyId(studyId)
