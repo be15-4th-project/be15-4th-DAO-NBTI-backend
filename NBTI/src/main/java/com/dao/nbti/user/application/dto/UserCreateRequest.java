@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.cglib.core.Local;
@@ -15,6 +17,7 @@ import java.util.Date;
 
 @Getter
 @ToString
+@Builder
 public class UserCreateRequest {
     @NotBlank
     @Size(min = 6)
