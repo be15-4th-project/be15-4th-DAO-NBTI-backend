@@ -1,6 +1,5 @@
 package com.dao.nbti.user.domain.aggregate;
 
-import com.dao.nbti.user.domain.aggregate.PointType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;

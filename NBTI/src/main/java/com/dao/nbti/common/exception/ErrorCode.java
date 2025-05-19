@@ -16,7 +16,7 @@ public enum ErrorCode {
     // 학습 관련 오류 (20001 ~ 29999)
     CATEGORY_NOT_FOUND("20001", "존재하지 않는 카테고리입니다.", HttpStatus.NOT_FOUND),
     ANSWER_TYPE_NOT_FOUND("20002", "존재하지 않는 답안 유형입니다.", HttpStatus.NOT_FOUND),
-    PROBLEM_NOT_FOUND("20003", "해당하는 조건의 문제가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
+    PROBLEM_NOT_FOUND("20003", "해당하는 문제가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
 
     // 공통 오류
     VALIDATION_ERROR("90001", "입력 값 검증 오류입니다.", HttpStatus.BAD_REQUEST),
