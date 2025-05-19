@@ -23,15 +23,18 @@ public class ProblemRepositoryImpl implements ProblemRepositoryCustom {
             p.problemId, p.categoryId, p.level, pc.name, c.name
         )
         FROM Problem p
-        JOIN Category c ON p.categoryId = c.id
-        LEFT JOIN Category pc ON c.parentCategoryId = pc.id
+        JOIN Category c ON p.categoryId = c.categoryId
+        LEFT JOIN Category pc ON c.parentCategoryId = pc.categoryId
         WHERE p.isDeleted = :isDeleted
         """;
-        StringBuilder jpql = getDynamicQueryBuilder(initQuery, request);
+        String jpql = getDynamicQuery(initQuery, request);
 
-        TypedQuery<ProblemSummaryDTO> query = em.createQuery(jpql.toString(), ProblemSummaryDTO.class);
+        TypedQuery<ProblemSummaryDTO> query = em.createQuery(jpql, ProblemSummaryDTO.class);
 
         query.setParameter("isDeleted", IsDeleted.N);
+        if (request.getParentCategoryId() != null) {
+            query.setParameter("parentCategoryId", request.getParentCategoryId());
+        }
         if (request.getChildCategoryId() != null) {
             query.setParameter("categoryId", request.getChildCategoryId());
         }
@@ -50,14 +53,17 @@ public class ProblemRepositoryImpl implements ProblemRepositoryCustom {
         String initQuery = """
         SELECT COUNT(p)
         FROM Problem p
-        JOIN Category c ON p.categoryId = c.id
-        LEFT JOIN Category pc ON c.parentCategoryId = pc.id
+        JOIN Category c ON p.categoryId = c.categoryId
+        LEFT JOIN Category pc ON c.parentCategoryId = pc.categoryId
         WHERE p.isDeleted = :isDeleted
         """;
-        StringBuilder jpql = getDynamicQueryBuilder(initQuery, request);
+        String jpql = getDynamicQuery(initQuery, request);
 
-        TypedQuery<Long> query = em.createQuery(jpql.toString(), Long.class);
+        TypedQuery<Long> query = em.createQuery(jpql, Long.class);
         query.setParameter("isDeleted", IsDeleted.N);
+        if (request.getParentCategoryId() != null) {
+            query.setParameter("parentCategoryId", request.getParentCategoryId());
+        }
         if (request.getChildCategoryId() != null) {
             query.setParameter("categoryId", request.getChildCategoryId());
         }
@@ -68,8 +74,12 @@ public class ProblemRepositoryImpl implements ProblemRepositoryCustom {
         return query.getSingleResult();
     }
 
-    private static StringBuilder getDynamicQueryBuilder(String str, ProblemSearchRequest request) {
+    private static String getDynamicQuery(String str, ProblemSearchRequest request) {
         StringBuilder jpql = new StringBuilder(str);
+
+        if (request.getParentCategoryId() != null) {
+            jpql.append("\nAND pc.categoryId = :parentCategoryId");
+        }
 
         if (request.getChildCategoryId() != null) {
             jpql.append("\nAND p.categoryId = :categoryId");
@@ -77,6 +87,6 @@ public class ProblemRepositoryImpl implements ProblemRepositoryCustom {
         if (request.getLevel() != null) {
             jpql.append("\nAND p.level = :level");
         }
-        return jpql;
+        return jpql.toString();
     }
 }

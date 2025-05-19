@@ -2,8 +2,10 @@ package com.dao.nbti.problem.application.dto.request;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 @Builder
 public class ProblemSearchRequest {
     private Integer page;
