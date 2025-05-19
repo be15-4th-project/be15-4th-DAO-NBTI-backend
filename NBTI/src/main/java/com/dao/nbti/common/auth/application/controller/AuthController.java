@@ -5,6 +5,7 @@ import com.dao.nbti.common.auth.application.dto.LoginResponse;
 import com.dao.nbti.common.auth.application.dto.TokenResponse;
 import com.dao.nbti.common.auth.application.service.AuthService;
 import com.dao.nbti.common.dto.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import java.time.Duration;
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
+    @Operation(summary = "로그인", description = "accountId와 password을 입력받아 로그인하고 토큰을 발급받는다.")
     @GetMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(@RequestBody LoginRequest loginRequest){
         LoginResponse response = authService.login(loginRequest);
@@ -29,6 +31,7 @@ public class AuthController {
     }
 
 
+    @Operation(summary = "토큰 재발급", description = "만료된 토큰을 재발급받아 재로그인 없이 인증 상태를 유지한다.")
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<TokenResponse>> refreshToken(
             @CookieValue(name = "refreshToken", required = false) String refreshToken
@@ -43,12 +46,37 @@ public class AuthController {
                 .body(ApiResponse.success(tokenResponse));
     }
 
+    @Operation(summary = "로그아웃", description = "사용자는 인증 토큰을 삭제하며 로그아웃한다.")
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout(
+            @CookieValue(name = "refreshToken", required = false) String refreshToken
+    ) {
+        if (refreshToken != null) {
+            authService.logout(refreshToken);
+        }
+        ResponseCookie deleteCookie = createDeleteRefreshTokenCookie();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, deleteCookie.toString())
+                .body(ApiResponse.success(null));
+    }
+
     private ResponseCookie createRefreshTokenCookie(String refreshToken) {
         return ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
                 // .secure(true) // 운영 환경에서 HTTPS 사용 시 활성화
                 .path("/")
                 .maxAge(Duration.ofDays(7))
+                .sameSite("Strict")
+                .build();
+    }
+
+    private ResponseCookie createDeleteRefreshTokenCookie() {
+        return ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                // .secure(true)
+                .path("/")
+                .maxAge(0)
                 .sameSite("Strict")
                 .build();
     }
