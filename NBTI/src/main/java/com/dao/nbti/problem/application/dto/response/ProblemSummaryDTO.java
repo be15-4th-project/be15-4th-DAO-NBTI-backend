@@ -1,6 +1,5 @@
 package com.dao.nbti.problem.application.dto.response;
 
-import com.dao.nbti.problem.domain.aggregate.IsDeleted;
 import lombok.Getter;
 
 @Getter
