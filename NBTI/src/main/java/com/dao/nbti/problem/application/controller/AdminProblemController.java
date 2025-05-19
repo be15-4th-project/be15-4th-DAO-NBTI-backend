@@ -5,6 +5,7 @@ import com.dao.nbti.common.exception.ErrorCode;
 import com.dao.nbti.problem.application.dto.request.ProblemCreateRequest;
 import com.dao.nbti.problem.application.dto.request.ProblemSearchRequest;
 import com.dao.nbti.problem.application.dto.request.ProblemUpdateRequest;
+import com.dao.nbti.problem.application.dto.response.ProblemDeleteResponse;
 import com.dao.nbti.problem.application.dto.response.ProblemDetailsResponse;
 import com.dao.nbti.problem.application.dto.response.ProblemListResponse;
 import com.dao.nbti.problem.application.service.AdminProblemService;
@@ -50,6 +51,13 @@ public class AdminProblemController {
     public ResponseEntity<ApiResponse<ProblemDetailsResponse>> updateProblem(@Valid @RequestBody ProblemUpdateRequest problemUpdateRequest, @PathVariable int problemId) {
 
         return ResponseEntity.ok(ApiResponse.success(adminProblemService.updateProblem(problemUpdateRequest, problemId)));
+    }
+
+    @DeleteMapping("/{problemId}")
+    @Operation(summary = "문제 삭제", description = "관리자가 서비스에 등록된 문제를 삭제합니다.")
+    public ResponseEntity<ApiResponse<ProblemDeleteResponse>> deleteProblem(@PathVariable int problemId) {
+
+        return ResponseEntity.ok(ApiResponse.success(adminProblemService.deleteProblem(problemId)));
     }
 
     @ExceptionHandler(ProblemException.class)

@@ -6,10 +6,7 @@ import com.dao.nbti.problem.application.dto.request.ProblemCommandRequest;
 import com.dao.nbti.problem.application.dto.request.ProblemCreateRequest;
 import com.dao.nbti.problem.application.dto.request.ProblemSearchRequest;
 import com.dao.nbti.problem.application.dto.request.ProblemUpdateRequest;
-import com.dao.nbti.problem.application.dto.response.ProblemDTO;
-import com.dao.nbti.problem.application.dto.response.ProblemDetailsResponse;
-import com.dao.nbti.problem.application.dto.response.ProblemListResponse;
-import com.dao.nbti.problem.application.dto.response.ProblemSummaryDTO;
+import com.dao.nbti.problem.application.dto.response.*;
 import com.dao.nbti.problem.domain.aggregate.*;
 import com.dao.nbti.problem.domain.repository.AnswerTypeRepository;
 import com.dao.nbti.problem.domain.repository.CategoryRepository;
@@ -48,7 +45,7 @@ public class AdminProblemService {
 
     @Transactional(readOnly = true)
     public ProblemDetailsResponse getProblemDetails(int problemId) {
-        Problem problem = problemRepository.findById(problemId)
+        Problem problem = problemRepository.findByProblemIdAndIsDeleted(problemId, IsDeleted.N)
                 .orElseThrow(() -> new ProblemException(ErrorCode.PROBLEM_NOT_FOUND));
         Category childCategory = categoryRepository.findById(problem.getCategoryId())
                 .orElseThrow(() -> new ProblemException(ErrorCode.CATEGORY_NOT_FOUND));
@@ -103,7 +100,7 @@ public class AdminProblemService {
 
     @Transactional
     public ProblemDetailsResponse updateProblem(ProblemUpdateRequest problemUpdateRequest, int problemId) {
-        Problem problem = problemRepository.findById(problemId)
+        Problem problem = problemRepository.findByProblemIdAndIsDeleted(problemId, IsDeleted.N)
                 .orElseThrow(() -> new ProblemException(ErrorCode.PROBLEM_NOT_FOUND));
         validateProblemCommandRequest(problemUpdateRequest);
         problem.updateFromRequest(problemUpdateRequest);
@@ -137,5 +134,18 @@ public class AdminProblemService {
         if (!answerTypeRepository.existsById(answerTypeId)) {
             throw new ProblemException(ErrorCode.ANSWER_TYPE_NOT_FOUND);
         }
+    }
+
+    public ProblemDeleteResponse deleteProblem(int problemId) {
+        boolean exists = problemRepository.existsByProblemIdAndIsDeleted(problemId, IsDeleted.N);
+        if (!exists) {
+            throw new ProblemException(ErrorCode.PROBLEM_NOT_FOUND);
+        }
+
+        problemRepository.deleteByProblemId(problemId, IsDeleted.Y);
+
+        return ProblemDeleteResponse.builder()
+                .problemId(problemId)
+                .build();
     }
 }
