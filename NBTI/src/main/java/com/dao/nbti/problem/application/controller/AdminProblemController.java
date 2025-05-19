@@ -1,12 +1,14 @@
 package com.dao.nbti.problem.application.controller;
 
 import com.dao.nbti.common.dto.ApiResponse;
+import com.dao.nbti.problem.application.dto.request.ProblemCreateRequest;
 import com.dao.nbti.problem.application.dto.request.ProblemSearchRequest;
 import com.dao.nbti.problem.application.dto.response.ProblemDetailsResponse;
 import com.dao.nbti.problem.application.dto.response.ProblemListResponse;
 import com.dao.nbti.problem.application.service.AdminProblemService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +33,13 @@ public class AdminProblemController {
     public ResponseEntity<ApiResponse<ProblemDetailsResponse>> getProblemDetails(@PathVariable int problemId) {
 
         return ResponseEntity.ok(ApiResponse.success(adminProblemService.getProblemDetails(problemId)));
+    }
+
+    @PostMapping
+    @Operation(summary = "문제 등록", description = "관리자가 서비스에 문제를 등록합니다.")
+    public ResponseEntity<ApiResponse<ProblemDetailsResponse>> createProblem(@Valid @RequestBody ProblemCreateRequest problemCreateRequest) {
+
+        return ResponseEntity.ok(ApiResponse.success(adminProblemService.createProblem(problemCreateRequest)));
     }
 
 }
