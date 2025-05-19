@@ -15,6 +15,7 @@ import com.dao.nbti.study.exception.NoSuchCategoryException;
 import com.dao.nbti.study.exception.ProblemNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -28,6 +29,7 @@ public class StudyService {
     private final CategoryRepository categoryRepository;
     private final AnswerTypeRepository answerTypeRepository;
 
+    @Transactional(readOnly = true)
     public List<ProblemResponseDto> getProblems(Integer parentCategoryId, int level) {
         List<Problem> problems = (level == 0)
                 ? problemRepository.findRandomProblemsByParentCategory(parentCategoryId)
