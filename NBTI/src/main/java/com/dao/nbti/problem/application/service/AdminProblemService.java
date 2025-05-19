@@ -15,6 +15,7 @@ import com.dao.nbti.problem.domain.repository.ProblemRepositoryCustom;
 import com.dao.nbti.problem.exception.ProblemException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -25,6 +26,7 @@ public class AdminProblemService {
     private final ProblemRepository problemRepository;
     private final CategoryRepository categoryRepository;
 
+    @Transactional(readOnly = true)
     public ProblemListResponse getProblems(ProblemSearchRequest problemSearchRequest) {
         List<ProblemSummaryDTO> problems = problemRepositoryCustom.getProblemsBy(problemSearchRequest);
 
@@ -40,6 +42,7 @@ public class AdminProblemService {
                 ).build();
     }
 
+    @Transactional(readOnly = true)
     public ProblemDetailsResponse getProblemDetails(int problemId) {
         Problem problem = problemRepository.findById(problemId)
                 .orElseThrow(() -> new ProblemException(ErrorCode.PROBLEM_NOT_FOUND));
