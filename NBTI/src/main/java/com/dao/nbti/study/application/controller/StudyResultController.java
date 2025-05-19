@@ -3,6 +3,7 @@ package com.dao.nbti.study.application.controller;
 import com.dao.nbti.common.dto.ApiResponse;
 import com.dao.nbti.common.dto.Pagination;
 import com.dao.nbti.study.application.dto.request.StudySearchCondition;
+import com.dao.nbti.study.application.dto.response.StudyDetailResponse;
 import com.dao.nbti.study.application.dto.response.StudySummaryResponse;
 import com.dao.nbti.study.application.service.StudyResultService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -58,4 +59,15 @@ public class StudyResultController {
 
         return ResponseEntity.ok(ApiResponse.success(response));
     }
+
+    @Operation(summary = "학습 상세 조회", description = "선택한 학습 내역의 상세 정보를 조회합니다.")
+    @GetMapping("/{studyId}")
+    public ResponseEntity<ApiResponse<StudyDetailResponse>> getStudyDetail(
+            @RequestParam(name = "userId") int userId,
+            @PathVariable int studyId
+    ) {
+        StudyDetailResponse detail = studyResultService.getStudyDetail(studyId, userId);
+        return ResponseEntity.ok(ApiResponse.success(detail));
+    }
+
 }

@@ -24,4 +24,6 @@ public interface StudyResultRepository extends JpaRepository<StudyResult, Intege
     """)
     List<String> findAllParentCategoryNamesByStudyId(@Param("studyId") int studyId);
 
+    List<StudyResult> findByStudyId(int studyId);
+
 }
