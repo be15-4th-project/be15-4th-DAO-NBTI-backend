@@ -153,4 +153,15 @@ class AuthServiceTest {
         assertThrows(BadCredentialsException.class, () ->authService.refreshToken(providedRefreshToken));
     }
 
+    @Test
+    void logout(){
+        String refreshToken = "refreshToken";
+        when(jwtTokenProvider.validateToken(refreshToken)).thenReturn(true);
+        when(jwtTokenProvider.getUsernameFromJWT(refreshToken)).thenReturn(String.valueOf(userId));
+        when(redisTemplate.delete(String.valueOf(userId))).thenReturn(true);
+
+        authService.logout(refreshToken);
+    }
+
+
 }
