@@ -1,7 +1,6 @@
 package com.dao.nbti.test.application.service;
 
-import com.dao.nbti.test.application.dto.request.AiAnswerCreateRequest;
-import com.dao.nbti.test.application.dto.response.AiAnswerResponse;
+import com.dao.nbti.test.application.dto.request.TestResultCreateRequest;
 import com.openai.client.OpenAIClient;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
 import com.openai.models.ChatModel;
@@ -30,7 +29,7 @@ public class TestAiAnswerServiceImpl implements TestAiAnswerService{
 
     /* 응답 생성 */
     @Override
-    public AiAnswerResponse createAiAnswer(AiAnswerCreateRequest request) {
+    public String createAiAnswer(TestResultCreateRequest request) {
 
         // 프롬포트 생성해서 넘겨 주기
         String prompt = createPrompt(request);
@@ -40,7 +39,7 @@ public class TestAiAnswerServiceImpl implements TestAiAnswerService{
         // 요청 전달하기
         ChatCompletionCreateParams params = ChatCompletionCreateParams.builder()
                 .model(ChatModel.GPT_3_5_TURBO) // 어떤 모델을 사용할지 지정하기
-                .addUserMessage(prompt) // GPz에게 입력하는 질문
+                .addUserMessage(prompt) // GPt에게 입력하는 질문
                 .temperature(0) // 창의성 조절 값 (0~1로 1에 가까울 수록 창의적임)
                 .build();
 
@@ -48,19 +47,12 @@ public class TestAiAnswerServiceImpl implements TestAiAnswerService{
         // 응답 결과 객체 : 채팅 기반 모델을 사용해 메시지 기반으로 응답 (AI 호출하기)
         ChatCompletion completion = client.chat().completions().create(params);
 
-        log.info("gpt 호출 중 에러 발생");
-
-        // 가장 처음에 넘어오는 message 값을 가져오기
-        String aiText = completion.choices().get(0).message().content().orElse("").trim();
-
         // AI 에게 응답 받은 거 생성하기
-        return AiAnswerResponse.builder()
-                .aiAnswer(aiText)
-                .build();
+        return completion.choices().get(0).message().content().orElse("").trim();
     }
 
     /* 프롬포트 만들기 */
-    private String createPrompt(AiAnswerCreateRequest request) {
+    private String createPrompt(TestResultCreateRequest request) {
         return String.format("""
                 다음은 사용자의 지능 검사 결과입니다.
                 각각의 검사별로 점수는 0점 ~ 6점까지 입니다.
