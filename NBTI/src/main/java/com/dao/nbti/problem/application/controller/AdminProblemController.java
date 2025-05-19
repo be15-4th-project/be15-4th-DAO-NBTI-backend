@@ -1,12 +1,14 @@
 package com.dao.nbti.problem.application.controller;
 
 import com.dao.nbti.common.dto.ApiResponse;
+import com.dao.nbti.common.exception.ErrorCode;
 import com.dao.nbti.problem.application.dto.request.ProblemCreateRequest;
 import com.dao.nbti.problem.application.dto.request.ProblemSearchRequest;
 import com.dao.nbti.problem.application.dto.request.ProblemUpdateRequest;
 import com.dao.nbti.problem.application.dto.response.ProblemDetailsResponse;
 import com.dao.nbti.problem.application.dto.response.ProblemListResponse;
 import com.dao.nbti.problem.application.service.AdminProblemService;
+import com.dao.nbti.problem.exception.ProblemException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -48,6 +50,14 @@ public class AdminProblemController {
     public ResponseEntity<ApiResponse<ProblemDetailsResponse>> updateProblem(@Valid @RequestBody ProblemUpdateRequest problemUpdateRequest, @PathVariable int problemId) {
 
         return ResponseEntity.ok(ApiResponse.success(adminProblemService.updateProblem(problemUpdateRequest, problemId)));
+    }
+
+    @ExceptionHandler(ProblemException.class)
+    public ResponseEntity<ApiResponse<Void>> handleProblemException(ProblemException e) {
+        ErrorCode errorCode = e.getErrorCode();
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(ApiResponse.failure(errorCode.getCode(), errorCode.getMessage()));
     }
 
 }
