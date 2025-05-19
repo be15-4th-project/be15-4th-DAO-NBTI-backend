@@ -2,7 +2,7 @@ package com.dao.nbti.user.application.controller;
 
 import com.dao.nbti.common.dto.ApiResponse;
 import com.dao.nbti.common.exception.ErrorCode;
-import com.dao.nbti.study.exception.NoSuchCategoryException;
+import com.dao.nbti.user.application.dto.IdDuplicateResponse;
 import com.dao.nbti.user.application.dto.UserCreateRequest;
 import com.dao.nbti.user.application.service.UserService;
 import com.dao.nbti.user.exception.UserException;
@@ -33,6 +33,15 @@ public class UserController {
         userService.deleteUser(userId);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
+
+    @Operation(summary = "아이디 중복 확인", description = "회원가입을 할 경우 해당 아이디가 서비스에 등록되어 있는지 확인한다.")
+    @GetMapping("/id-duplicate")
+    public ResponseEntity<ApiResponse<IdDuplicateResponse>> idDuplicate(@RequestParam String accountId){
+        IdDuplicateResponse response = userService.checkAccountId(accountId);
+
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
 
     @ExceptionHandler(UserException.class)
     public ResponseEntity<ApiResponse<Void>> handleUserException(UserException e) {
