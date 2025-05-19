@@ -51,9 +51,9 @@ public class AuthController {
     public ResponseEntity<ApiResponse<Void>> logout(
             @CookieValue(name = "refreshToken", required = false) String refreshToken
     ) {
-        if (refreshToken != null) {
-            authService.logout(refreshToken);
-        }
+
+        authService.logout(refreshToken);
+
         ResponseCookie deleteCookie = createDeleteRefreshTokenCookie();
 
         return ResponseEntity.ok()
