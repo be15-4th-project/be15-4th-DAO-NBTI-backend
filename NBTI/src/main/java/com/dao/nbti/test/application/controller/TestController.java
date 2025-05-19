@@ -27,7 +27,7 @@ public class TestController {
     public ResponseEntity<ApiResponse<AiAnswerResponse>> getAiAnswer(
             @RequestBody @Validated  AiAnswerCreateRequest request
     ) {
-        AiAnswerResponse response = testAiAnswerService.getAiAnswer(request);
+        AiAnswerResponse response = testAiAnswerService.createAiAnswer(request);
 
         return ResponseEntity.ok(ApiResponse.success(response));
     }

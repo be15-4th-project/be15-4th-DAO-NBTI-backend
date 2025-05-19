@@ -28,9 +28,9 @@ public class TestAiAnswerServiceImpl implements TestAiAnswerService{
                         .build();
     }
 
-    /* 응답 받기 */
+    /* 응답 생성 */
     @Override
-    public AiAnswerResponse getAiAnswer(AiAnswerCreateRequest request) {
+    public AiAnswerResponse createAiAnswer(AiAnswerCreateRequest request) {
 
         // 프롬포트 생성해서 넘겨 주기
         String prompt = createPrompt(request);

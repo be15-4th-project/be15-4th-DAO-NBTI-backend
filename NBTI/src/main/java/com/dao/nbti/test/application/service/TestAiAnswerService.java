@@ -5,6 +5,6 @@ import com.dao.nbti.test.application.dto.response.AiAnswerResponse;
 
 public interface TestAiAnswerService {
 
-    AiAnswerResponse getAiAnswer(AiAnswerCreateRequest request);
+    AiAnswerResponse createAiAnswer(AiAnswerCreateRequest request);
 
 }
