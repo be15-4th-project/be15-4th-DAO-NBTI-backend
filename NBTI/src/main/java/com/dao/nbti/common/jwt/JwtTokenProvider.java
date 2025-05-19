@@ -32,11 +32,11 @@ public class JwtTokenProvider {
     }
 
     // access token 생성 메소드
-    public String createToken(String loginId, String role) {
+    public String createToken(String userId, String role) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpiration);
         return Jwts.builder()
-                .subject(loginId)
+                .subject(userId)
                 .claim("role", role)
                 .issuedAt(now)
                 .expiration(expiryDate)
@@ -45,11 +45,11 @@ public class JwtTokenProvider {
     }
 
     // refresh token 생성 메소드
-    public String createRefreshToken(String loginId, String role) {
+    public String createRefreshToken(String userId, String role) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtRefreshExpiration);
         return Jwts.builder()
-                .subject(loginId)
+                .subject(userId)
                 .claim("role", role)
                 .issuedAt(now)
                 .expiration(expiryDate)
