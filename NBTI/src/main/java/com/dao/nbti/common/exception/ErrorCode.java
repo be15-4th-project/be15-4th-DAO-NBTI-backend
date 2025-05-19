@@ -12,10 +12,15 @@ public enum ErrorCode {
     LOGIN_ID_ALREADY_EXISTS("10001", "이미 사용중인 ID 입니다.", HttpStatus.CONFLICT),
     USER_NOT_FOUND("10002","존재하지 않는 사용자입니다.",HttpStatus.NOT_FOUND),
     INVALID_CREDENTIALS("10003", "올바르지 않은 아이디 혹은 비밀번호입니다.", HttpStatus.UNAUTHORIZED),
-
+    
+    // 학습 관련 오류 (20001 ~ 29999)
+    CATEGORY_NOT_FOUND("20001", "존재하지 않는 카테고리입니다.", HttpStatus.NOT_FOUND),
+    ANSWER_TYPE_NOT_FOUND("20002", "존재하지 않는 답안 유형입니다.", HttpStatus.NOT_FOUND),
+    PROBLEM_NOT_FOUND("20003", "해당하는 조건의 문제가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
+  
     // 문제 오류 (30000~39999)
     PROBLEM_NOT_FOUND("30001", "존재하지 않는 문제입니다.", HttpStatus.NOT_FOUND),
-    CATEGORY_NOT_FOUND("30002", "존재하지 않는 카테고리입니다." , HttpStatus.NOT_FOUND ),
+    CATEGORY_NOT_FOUND("30002", "존재하지 않는 카테고리입니다." , HttpStatus.NOT_FOUND),
     ANSWER_TYPE_NOT_FOUND("30003", "존재하지 않는 정답 유형입니다.", HttpStatus.NOT_FOUND ),
 
     // 공통 오류
