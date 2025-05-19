@@ -15,4 +15,6 @@ public interface ObjectionRepository extends JpaRepository<Objection, Integer> {
     // 사용자 ID + 상태로 필터링된 목록 조회
     List<Objection> findByUserIdAndStatus(int userId, Status status);
 
+    // 특정 사용자의 이의 제기 상세 조회 (소유자 검증 포함)
+    Optional<Objection> findByObjectionIdAndUserId(int objectionId, int userId);
 }

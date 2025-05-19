@@ -33,4 +33,19 @@ public class ObjectionServiceImpl implements ObjectionService {
         ).toList();
     }
 
+    @Override
+    public ObjectionDetailResponse getObjectionDetail(int objectionId, int userId) {
+        Objection objection = objectionRepository.findByObjectionIdAndUserId(objectionId, userId)
+                .orElseThrow(() -> new ObjectionException(ErrorCode.UNAUTHORIZED_TEST_RESULT_ACCESS)); // or OBJECTION_NOT_FOUND
+
+        return ObjectionDetailResponse.builder()
+                .objectionId(objection.getObjectionId())
+                .problemId(objection.getProblemId())
+                .status(objection.getStatus())
+                .reason(objection.getReason())
+                .information(objection.getInformation())
+                .createdAt(objection.getCreatedAt())
+                .processedAt(objection.getProcessedAt())
+                .build();
+    }
 }

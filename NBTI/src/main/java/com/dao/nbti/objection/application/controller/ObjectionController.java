@@ -35,4 +35,17 @@ public class ObjectionController {
         List<ObjectionSummaryResponse> list = objectionService.getObjectionsByUser(userId, status);
         return ResponseEntity.ok(ApiResponse.success(list));
     }
+
+    @Operation(summary = "이의 제기 상세 조회", description = "선택한 이의 제기 항목의 상세 정보를 조회합니다.")
+    @GetMapping("/{objectionId}")
+    public ResponseEntity<ApiResponse<ObjectionDetailResponse>> getObjectionDetail(
+            @Parameter(description = "조회할 이의 제기 ID", example = "7")
+            @PathVariable int objectionId,
+
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal(expression = "userId") int userId
+    ) {
+        ObjectionDetailResponse detail = objectionService.getObjectionDetail(objectionId, userId);
+        return ResponseEntity.ok(ApiResponse.success(detail));
+    }
 }

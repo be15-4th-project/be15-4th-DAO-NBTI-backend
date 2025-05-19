@@ -11,4 +11,6 @@ public interface ObjectionService {
     // 목록 조회
     List<ObjectionSummaryResponse> getObjectionsByUser(int userId, Status status);
 
+    // 상세 조회
+    ObjectionDetailResponse getObjectionDetail(int objectionId, int userId);
 }
