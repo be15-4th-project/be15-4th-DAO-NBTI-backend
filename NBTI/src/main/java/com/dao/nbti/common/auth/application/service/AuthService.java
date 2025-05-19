@@ -3,6 +3,7 @@ package com.dao.nbti.common.auth.application.service;
 
 import com.dao.nbti.common.auth.application.dto.LoginRequest;
 import com.dao.nbti.common.auth.application.dto.LoginResponse;
+import com.dao.nbti.common.auth.application.dto.TokenResponse;
 import com.dao.nbti.common.auth.domain.aggregate.RefreshToken;
 import com.dao.nbti.common.exception.ErrorCode;
 import com.dao.nbti.common.jwt.JwtTokenProvider;
@@ -11,6 +12,7 @@ import com.dao.nbti.user.domain.repository.UserRepository;
 import com.dao.nbti.user.exception.UserException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -51,6 +53,47 @@ public class AuthService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .authority(user.getAuthority())
+                .build();
+    }
+
+    public TokenResponse refreshToken(String providedRefreshToken) {
+        // 리프레시 토큰 유효성 검사, 저장 되어 있는 userId 추출
+        jwtTokenProvider.validateToken(providedRefreshToken);
+        String userId = jwtTokenProvider.getUsernameFromJWT(providedRefreshToken);
+
+        // Redis에 저장된 리프레시 토큰 조회
+        RefreshToken storedRefreshToken = redisTemplate.opsForValue().get(userId);
+        if (storedRefreshToken == null) {
+            throw new BadCredentialsException("해당 유저로 조회되는 리프레시 토큰 없음");
+        }
+
+        // 넘어온 리프레시 토큰과 Redis의 토큰 비교
+        if (!storedRefreshToken.getToken().equals(providedRefreshToken)) {
+            throw new BadCredentialsException("리프레시 토큰 일치하지 않음");
+        }
+
+        User user = userRepository.findByUserIdAndDeletedAtIsNull(Integer.valueOf(userId))
+                .orElseThrow(() -> new BadCredentialsException("해당 리프레시 토큰을 위한 유저 없음"));
+
+        // 새로운 토큰 재발급
+        String accessToken = jwtTokenProvider.createToken(String.valueOf(user.getUserId()), user.getAuthority().name());
+        String refreshToken = jwtTokenProvider.createRefreshToken(String.valueOf(user.getUserId()), user.getAuthority().name());
+
+
+        RefreshToken newToken = RefreshToken.builder()
+                .token(refreshToken)
+                .build();
+
+        // Redis에 새로운 리프레시 토큰 저장 (기존 토큰 덮어쓰기)
+        redisTemplate.opsForValue().set(
+                String.valueOf(user.getUserId()),
+                newToken,
+                Duration.ofDays(7)
+        );
+
+        return TokenResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 }
