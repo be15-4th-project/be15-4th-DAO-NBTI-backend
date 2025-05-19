@@ -17,7 +17,7 @@ import java.util.Date;
 @ToString
 public class UserCreateRequest {
     @NotBlank
-    @Size(min = 8)
+    @Size(min = 6)
     @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "아이디는 영문 또는 숫자만 입력할 수 있습니다")
     private String accountId;
 
