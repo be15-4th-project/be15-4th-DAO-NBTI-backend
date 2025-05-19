@@ -63,7 +63,10 @@ public class StudyResultController {
     @Operation(summary = "학습 상세 조회", description = "선택한 학습 내역의 상세 정보를 조회합니다.")
     @GetMapping("/{studyId}")
     public ResponseEntity<ApiResponse<StudyDetailResponse>> getStudyDetail(
-            @RequestParam(name = "userId") int userId,
+            @Parameter(hidden = true, description = "JWT 인증된 사용자 ID")
+            @AuthenticationPrincipal(expression = "userId") int userId,
+
+            @Parameter(description = "학습 ID", example = "1")
             @PathVariable int studyId
     ) {
         StudyDetailResponse detail = studyResultService.getStudyDetail(studyId, userId);
