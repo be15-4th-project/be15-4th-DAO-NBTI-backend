@@ -1,5 +1,7 @@
 package com.dao.nbti.problem.application.dto.response;
 
+import com.dao.nbti.problem.domain.aggregate.Category;
+import com.dao.nbti.problem.domain.aggregate.Problem;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -26,5 +28,19 @@ public class ProblemDTO {
         this.contentImageUrl = contentImageUrl;
         this.correctAnswer = correctAnswer;
         this.level = level;
+    }
+
+    public static ProblemDTO from(Problem problem, Category childCategory, Category parentCategory, String answerTypeDescription) {
+        return ProblemDTO.builder()
+                .problemId(problem.getProblemId())
+                .categoryId(problem.getCategoryId())
+                .parentCategoryName(parentCategory.getName())
+                .childCategoryName(childCategory.getName())
+                .answerTypeId(problem.getAnswerTypeId())
+                .answerTypeDescription(answerTypeDescription)
+                .contentImageUrl(problem.getContentImageUrl())
+                .correctAnswer(problem.getCorrectAnswer())
+                .level(problem.getLevel())
+                .build();
     }
 }

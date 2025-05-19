@@ -2,8 +2,10 @@ package com.dao.nbti.problem.application.service;
 
 import com.dao.nbti.common.dto.Pagination;
 import com.dao.nbti.common.exception.ErrorCode;
+import com.dao.nbti.problem.application.dto.request.ProblemCommandRequest;
 import com.dao.nbti.problem.application.dto.request.ProblemCreateRequest;
 import com.dao.nbti.problem.application.dto.request.ProblemSearchRequest;
+import com.dao.nbti.problem.application.dto.request.ProblemUpdateRequest;
 import com.dao.nbti.problem.application.dto.response.ProblemDTO;
 import com.dao.nbti.problem.application.dto.response.ProblemDetailsResponse;
 import com.dao.nbti.problem.application.dto.response.ProblemListResponse;
@@ -48,28 +50,16 @@ public class AdminProblemService {
     public ProblemDetailsResponse getProblemDetails(int problemId) {
         Problem problem = problemRepository.findById(problemId)
                 .orElseThrow(() -> new ProblemException(ErrorCode.PROBLEM_NOT_FOUND));
-        Category category = categoryRepository.findById(problem.getCategoryId())
+        Category childCategory = categoryRepository.findById(problem.getCategoryId())
                 .orElseThrow(() -> new ProblemException(ErrorCode.CATEGORY_NOT_FOUND));
-        Category parentCategory = categoryRepository.findById(category.getParentCategoryId())
+        Category parentCategory = categoryRepository.findById(childCategory.getParentCategoryId())
                 .orElseThrow(() -> new ProblemException(ErrorCode.CATEGORY_NOT_FOUND));
         AnswerType answerType = answerTypeRepository.findById(problem.getAnswerTypeId())
                 .orElseThrow(() -> new ProblemException(ErrorCode.ANSWER_TYPE_NOT_FOUND));
 
-        String childCategoryName = category.getName();
-        String parentCategoryName = parentCategory.getName();
         String answerTypeDescription = AnswerTypeEnum.of(answerType.getAnswerTypeId());
 
-        ProblemDTO problemDTO = ProblemDTO.builder()
-                .problemId(problem.getProblemId())
-                .categoryId(problem.getProblemId())
-                .parentCategoryName(parentCategoryName)
-                .childCategoryName(childCategoryName)
-                .answerTypeId(problem.getAnswerTypeId())
-                .answerTypeDescription(answerTypeDescription)
-                .contentImageUrl(problem.getContentImageUrl())
-                .correctAnswer(problem.getCorrectAnswer())
-                .level(problem.getLevel())
-                .build();
+        ProblemDTO problemDTO = ProblemDTO.from(problem, childCategory, parentCategory, answerTypeDescription);
 
         return ProblemDetailsResponse.builder()
                 .problem(problemDTO)
@@ -85,7 +75,7 @@ public class AdminProblemService {
         String correctAnswer = problemCreateRequest.getCorrectAnswer();
         int level = problemCreateRequest.getLevel();
 
-        validateProblemCreateRequest(problemCreateRequest);
+        validateProblemCommandRequest(problemCreateRequest);
 
         Problem problem = Problem.builder()
                 .categoryId(categoryId)
@@ -97,33 +87,40 @@ public class AdminProblemService {
                 .build();
 
         Problem saved = problemRepository.save(problem);
-        String answerTypeDescription = AnswerTypeEnum.of(problemCreateRequest.getAnswerTypeId());
 
         Category childCategory = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ProblemException(ErrorCode.CATEGORY_NOT_FOUND));
         Category parentCategory = categoryRepository.findById(childCategory.getParentCategoryId())
                 .orElseThrow(() -> new ProblemException(ErrorCode.CATEGORY_NOT_FOUND));
+        String answerTypeDescription = AnswerTypeEnum.of(problemCreateRequest.getAnswerTypeId());
 
-        ProblemDTO problemDTO = ProblemDTO.builder()
-                .problemId(saved.getProblemId())
-                .categoryId(categoryId)
-                .parentCategoryName(parentCategory.getName())
-                .childCategoryName(childCategory.getName())
-                .answerTypeId(answerTypeId)
-                .answerTypeDescription(answerTypeDescription)
-                .contentImageUrl(contentImageUrl)
-                .correctAnswer(correctAnswer)
-                .level(level)
-                .build();
+        ProblemDTO problemDTO = ProblemDTO.from(saved, childCategory, parentCategory, answerTypeDescription);
 
         return ProblemDetailsResponse.builder()
                 .problem(problemDTO)
                 .build();
     }
 
-    private void validateProblemCreateRequest(ProblemCreateRequest problemCreateRequest) {
-        int categoryId = problemCreateRequest.getCategoryId();
-        int answerTypeId = problemCreateRequest.getAnswerTypeId();
+    @Transactional
+    public ProblemDetailsResponse updateProblem(ProblemUpdateRequest problemUpdateRequest, int problemId) {
+        Problem problem = problemRepository.findById(problemId)
+                .orElseThrow(() -> new ProblemException(ErrorCode.PROBLEM_NOT_FOUND));
+        validateProblemCommandRequest(problemUpdateRequest);
+        problem.updateFromRequest(problemUpdateRequest);
+
+        Category childCategory = categoryRepository.findById(problem.getCategoryId())
+                .orElseThrow(() -> new ProblemException(ErrorCode.CATEGORY_NOT_FOUND));
+        Category parentCategory = categoryRepository.findById(childCategory.getParentCategoryId())
+                .orElseThrow(() -> new ProblemException(ErrorCode.CATEGORY_NOT_FOUND));
+        String answerTypeDescription = AnswerTypeEnum.of(problem.getAnswerTypeId());
+
+        ProblemDTO problemDTO = ProblemDTO.from(problem, childCategory, parentCategory, answerTypeDescription);
+        return ProblemDetailsResponse.builder().problem(problemDTO).build();
+    }
+
+    private void validateProblemCommandRequest(ProblemCommandRequest problemCommandRequest) {
+        int categoryId = problemCommandRequest.getCategoryId();
+        int answerTypeId = problemCommandRequest.getAnswerTypeId();
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ProblemException(ErrorCode.CATEGORY_NOT_FOUND));
 
