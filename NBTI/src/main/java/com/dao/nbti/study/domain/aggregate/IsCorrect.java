@@ -1,4 +1,5 @@
 package com.dao.nbti.study.domain.aggregate;
 
-public class myentity {
+public enum IsCorrect {
+    Y, N
 }
