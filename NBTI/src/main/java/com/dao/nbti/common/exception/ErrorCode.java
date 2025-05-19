@@ -18,9 +18,9 @@ public enum ErrorCode {
     ANSWER_TYPE_NOT_FOUND("20002", "존재하지 않는 답안 유형입니다.", HttpStatus.NOT_FOUND),
     PROBLEM_NOT_FOUND("20003", "해당하는 조건의 문제가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
 
-    // 검사 결과 오류 (20000 ~ 29999)
-    TEST_RESULT_NOT_FOUND("20001", "검사 결과를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
-    UNAUTHORIZED_TEST_RESULT_ACCESS("20002", "본인의 검사 결과만 조회할 수 있습니다.", HttpStatus.FORBIDDEN),
+    // 검사 결과 오류 (30000 ~ 39999)
+    TEST_RESULT_NOT_FOUND("30001", "검사 결과를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    UNAUTHORIZED_TEST_RESULT_ACCESS("30002", "본인의 검사 결과만 조회할 수 있습니다.", HttpStatus.FORBIDDEN),
 
     // 공통 오류
     VALIDATION_ERROR("90001", "입력 값 검증 오류입니다.", HttpStatus.BAD_REQUEST),
