@@ -1,4 +1,4 @@
-package com.dao.nbti.test.application.dto;
+package com.dao.nbti.test.application.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;

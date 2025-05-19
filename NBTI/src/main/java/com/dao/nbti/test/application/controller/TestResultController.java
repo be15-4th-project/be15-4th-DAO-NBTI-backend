@@ -2,9 +2,9 @@ package com.dao.nbti.test.application.controller;
 
 import com.dao.nbti.common.dto.ApiResponse;
 import com.dao.nbti.common.dto.Pagination;
-import com.dao.nbti.test.application.dto.TestResultDetailResponse;
+import com.dao.nbti.test.application.dto.response.TestResultDetailResponse;
 import com.dao.nbti.test.application.dto.request.TestResultSearchCondition;
-import com.dao.nbti.test.application.dto.TestResultSummaryResponse;
+import com.dao.nbti.test.application.dto.response.TestResultSummaryResponse;
 import com.dao.nbti.test.application.service.TestResultService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

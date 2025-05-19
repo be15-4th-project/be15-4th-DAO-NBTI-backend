@@ -1,8 +1,8 @@
 package com.dao.nbti.test.application.service;
 
-import com.dao.nbti.test.application.dto.TestResultDetailResponse;
+import com.dao.nbti.test.application.dto.response.TestResultDetailResponse;
 import com.dao.nbti.test.application.dto.request.TestResultSearchCondition;
-import com.dao.nbti.test.application.dto.TestResultSummaryResponse;
+import com.dao.nbti.test.application.dto.response.TestResultSummaryResponse;
 import com.dao.nbti.test.domain.aggregate.TestResult;
 import com.dao.nbti.test.domain.repository.TestResultRepository;
 import com.dao.nbti.test.exception.TestResultException;
