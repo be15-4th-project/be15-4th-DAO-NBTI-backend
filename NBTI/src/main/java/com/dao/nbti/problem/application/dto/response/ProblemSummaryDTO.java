@@ -9,8 +9,6 @@ public class ProblemSummaryDTO {
     private Integer categoryId;
     private String parentCategoryName;
     private String childCategoryName;
-    private Integer answerTypeId;
-    private IsDeleted isDeleted;
     private int level;
 
 
