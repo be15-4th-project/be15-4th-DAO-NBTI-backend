@@ -1,9 +1,11 @@
 package com.dao.nbti.problem.domain.aggregate;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
 @Entity
 @Table(name = "problem")
+@Getter
 public class Problem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
