@@ -1,5 +1,6 @@
 package com.dao.nbti.user.application.service;
 
+import com.dao.nbti.user.application.dto.IdDuplicateResponse;
 import com.dao.nbti.user.application.dto.UserCreateRequest;
 import com.dao.nbti.user.domain.aggregate.Authority;
 import com.dao.nbti.user.domain.aggregate.Gender;
@@ -15,7 +16,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -98,6 +100,24 @@ class UserServiceTest {
         when(userRepository.findByUserIdAndDeletedAtIsNull(userId)).thenReturn(Optional.empty());
 
         assertThrows(UserException.class ,()-> userService.deleteUser(userId));
+    }
+
+    @Test
+    void checkAccountId_isDuplicate() {
+        when(userRepository.findByAccountId(accountId)).thenReturn(Optional.of(user));
+
+        IdDuplicateResponse response = userService.checkAccountId(accountId);
+
+        assertTrue(response.isDuplicate());
+    }
+
+    @Test
+    void checkAccountId_isNotDuplicate() {
+        when(userRepository.findByAccountId(accountId)).thenReturn(Optional.empty());
+
+        IdDuplicateResponse response = userService.checkAccountId(accountId);
+
+        assertFalse(response.isDuplicate());
     }
 
 }
