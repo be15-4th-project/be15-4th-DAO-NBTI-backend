@@ -14,5 +14,6 @@ public class Category {
     @NotNull
     @NotBlank
     private String name;
+    private String description;
     private int timeLimit;
 }
