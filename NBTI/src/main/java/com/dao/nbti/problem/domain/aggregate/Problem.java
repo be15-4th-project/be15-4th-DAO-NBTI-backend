@@ -20,4 +20,3 @@ public class Problem {
     private IsDeleted isDeleted;
     private int level;
 }
-
