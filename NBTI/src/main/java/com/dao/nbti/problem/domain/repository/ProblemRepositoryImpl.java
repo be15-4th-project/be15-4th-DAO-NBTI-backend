@@ -2,6 +2,7 @@ package com.dao.nbti.problem.domain.repository;
 
 import com.dao.nbti.problem.application.dto.request.ProblemSearchRequest;
 import com.dao.nbti.problem.application.dto.response.ProblemSummaryDTO;
+import com.dao.nbti.problem.domain.aggregate.IsDeleted;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -18,16 +19,19 @@ public class ProblemRepositoryImpl implements ProblemRepositoryCustom {
     @Override
     public List<ProblemSummaryDTO> getProblemsBy(ProblemSearchRequest request) {
         String initQuery = """
-                SELECT new com.dao.nbti.problem.application.dto.response.ProblemSummaryDTO(
-                p.problemId, p.categoryId, p.level
-                )
-                FROM Problem p
-                WHERE p.isDeleted=com.dao.nbti.problem.domain.aggregate.IsDeleted.N
-                """;
+        SELECT new com.dao.nbti.problem.application.dto.response.ProblemSummaryDTO(
+            p.problemId, p.categoryId, p.level, pc.name, c.name
+        )
+        FROM Problem p
+        JOIN Category c ON p.categoryId = c.id
+        LEFT JOIN Category pc ON c.parentCategoryId = pc.id
+        WHERE p.isDeleted = :isDeleted
+        """;
         StringBuilder jpql = getDynamicQueryBuilder(initQuery, request);
 
         TypedQuery<ProblemSummaryDTO> query = em.createQuery(jpql.toString(), ProblemSummaryDTO.class);
 
+        query.setParameter("isDeleted", IsDeleted.N);
         if (request.getChildCategoryId() != null) {
             query.setParameter("categoryId", request.getChildCategoryId());
         }
@@ -42,16 +46,18 @@ public class ProblemRepositoryImpl implements ProblemRepositoryCustom {
     }
 
     @Override
-    public int countProblemsBy(ProblemSearchRequest request) {
+    public long countProblemsBy(ProblemSearchRequest request) {
         String initQuery = """
-                SELECT COUNT(p)
-                FROM Problem p
-                WHERE p.isDeleted=com.dao.nbti.problem.domain.aggregate.IsDeleted.N
-                """;
+        SELECT COUNT(p)
+        FROM Problem p
+        JOIN Category c ON p.categoryId = c.id
+        LEFT JOIN Category pc ON c.parentCategoryId = pc.id
+        WHERE p.isDeleted = :isDeleted
+        """;
         StringBuilder jpql = getDynamicQueryBuilder(initQuery, request);
 
-        TypedQuery<Integer> query = em.createQuery(jpql.toString(), Integer.class);
-
+        TypedQuery<Long> query = em.createQuery(jpql.toString(), Long.class);
+        query.setParameter("isDeleted", IsDeleted.N);
         if (request.getChildCategoryId() != null) {
             query.setParameter("categoryId", request.getChildCategoryId());
         }

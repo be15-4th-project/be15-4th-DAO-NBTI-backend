@@ -18,7 +18,7 @@ public class AdminProblemService {
     public ProblemListResponse getProblems(ProblemSearchRequest problemSearchRequest) {
         List<ProblemSummaryDTO> problems = problemRepositoryCustom.getProblemsBy(problemSearchRequest);
 
-        int totalItems = problemRepositoryCustom.countProblemsBy(problemSearchRequest);
+        long totalItems = problemRepositoryCustom.countProblemsBy(problemSearchRequest);
 
         return ProblemListResponse.builder()
                 .problems(problems)

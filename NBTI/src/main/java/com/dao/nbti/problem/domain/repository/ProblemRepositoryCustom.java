@@ -9,5 +9,5 @@ public interface ProblemRepositoryCustom {
 
     List<ProblemSummaryDTO> getProblemsBy(ProblemSearchRequest problemSearchRequest);
 
-    int countProblemsBy(ProblemSearchRequest problemSearchRequest);
+    long countProblemsBy(ProblemSearchRequest problemSearchRequest);
 }
