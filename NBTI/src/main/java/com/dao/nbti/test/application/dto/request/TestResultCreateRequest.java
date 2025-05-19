@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class AiAnswerCreateRequest {
+public class TestResultCreateRequest {
 
     @Min(0) @Max(6)
     private final int langComp;
