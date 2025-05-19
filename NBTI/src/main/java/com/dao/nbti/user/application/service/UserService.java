@@ -3,8 +3,8 @@ package com.dao.nbti.user.application.service;
 
 
 import com.dao.nbti.common.exception.ErrorCode;
+import com.dao.nbti.user.application.dto.IdDuplicateResponse;
 import com.dao.nbti.user.application.dto.UserCreateRequest;
-import com.dao.nbti.user.domain.aggregate.IsDeleted;
 import com.dao.nbti.user.domain.aggregate.User;
 import com.dao.nbti.user.domain.repository.UserRepository;
 import com.dao.nbti.user.exception.UserException;
@@ -14,8 +14,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
 
 @Service
 @Slf4j
@@ -40,5 +38,14 @@ public class UserService {
         User user = userRepository.findByUserIdAndDeletedAtIsNull(userId)
                 .orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND));
         user.delete();
+    }
+
+    @Transactional
+    public IdDuplicateResponse checkAccountId(String accountId) {
+        boolean isDuplicate = userRepository.findByAccountId(accountId).isPresent();
+
+        return IdDuplicateResponse.builder()
+                .isDuplicate(isDuplicate)
+                .build();
     }
 }
