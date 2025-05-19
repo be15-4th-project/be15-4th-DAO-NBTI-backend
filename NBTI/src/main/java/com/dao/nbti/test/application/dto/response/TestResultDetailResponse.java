@@ -4,10 +4,12 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Builder
 public class TestResultDetailResponse {
+    private List<CategoryScoreDetail> scores;
     private int langComp;
     private int generalKnowledge;
     private int percReason;
@@ -17,3 +19,4 @@ public class TestResultDetailResponse {
     private String aiText;
     private LocalDateTime createdAt;
 }
+
