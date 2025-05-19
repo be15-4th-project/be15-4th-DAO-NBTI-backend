@@ -1,0 +1,31 @@
+package com.dao.nbti.test.application.dto.request;
+
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
+public class AiAnswerCreateRequest {
+
+    @Min(0) @Max(6)
+    private final int langComp;
+
+    @Min(0) @Max(6)
+    private final int generalKnowledge;
+
+    @Min(0) @Max(6)
+
+    private final int percReason;
+
+    @Min(0) @Max(6)
+    private final int workMemory;
+
+    @Min(0) @Max(6)
+    private final int procSpeed;
+
+    @Min(0) @Max(6)
+    private final int spatialPerception;
+
+}
