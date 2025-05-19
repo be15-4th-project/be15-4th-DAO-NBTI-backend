@@ -17,4 +17,7 @@ public interface ObjectionRepository extends JpaRepository<Objection, Integer> {
 
     // 특정 사용자의 이의 제기 상세 조회 (소유자 검증 포함)
     Optional<Objection> findByObjectionIdAndUserId(int objectionId, int userId);
+
+    // 중복 이의 제기 여부 확인
+    boolean existsByUserIdAndProblemId(int userId, int problemId);
 }

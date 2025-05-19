@@ -1,6 +1,8 @@
 package com.dao.nbti.objection.application.controller;
 
 import com.dao.nbti.common.dto.ApiResponse;
+import com.dao.nbti.objection.application.dto.request.ObjectionCreateRequest;
+import com.dao.nbti.objection.application.dto.response.ObjectionCreateResponse;
 import com.dao.nbti.objection.application.dto.response.ObjectionDetailResponse;
 import com.dao.nbti.objection.application.dto.response.ObjectionSummaryResponse;
 import com.dao.nbti.objection.application.service.ObjectionService;
@@ -8,6 +10,7 @@ import com.dao.nbti.objection.domain.aggregate.Status;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -48,4 +51,29 @@ public class ObjectionController {
         ObjectionDetailResponse detail = objectionService.getObjectionDetail(objectionId, userId);
         return ResponseEntity.ok(ApiResponse.success(detail));
     }
+
+    @PostMapping
+    @Operation(summary = "이의 제기 등록", description = "문제에 대한 이의 제기를 등록합니다. 사유는 필수이며, 동일 문제에 대해 중복 등록할 수 없습니다.")
+    public ResponseEntity<ApiResponse<Void>> createObjection(
+            @RequestBody @Valid ObjectionCreateRequest request,
+
+            @Parameter(hidden = true, description = "JWT 인증된 사용자 ID")
+            @AuthenticationPrincipal(expression = "userId") int userId
+    ) {
+        objectionService.createObjection(request, userId);
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    @PostMapping("/test") // 실제 운영 POST와 구분되도록 경로 뒤에 /test 추가
+    @Operation(summary = "이의 제기 등록 (테스트용)", description = "문제에 대한 이의 제기를 등록합니다. JWT 인증 없이 userId를 쿼리로 받습니다.")
+    public ResponseEntity<ApiResponse<ObjectionCreateResponse>>  createObjectionTest(
+            @RequestBody @Valid ObjectionCreateRequest request,
+
+            @RequestParam(name = "userId") int userId
+    ) {
+        ObjectionCreateResponse response = objectionService.createObjection(request, userId);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+
 }

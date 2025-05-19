@@ -1,5 +1,7 @@
 package com.dao.nbti.objection.application.service;
 
+import com.dao.nbti.objection.application.dto.request.ObjectionCreateRequest;
+import com.dao.nbti.objection.application.dto.response.ObjectionCreateResponse;
 import com.dao.nbti.objection.application.dto.response.ObjectionSummaryResponse;
 import com.dao.nbti.objection.application.dto.response.ObjectionDetailResponse;
 import com.dao.nbti.objection.domain.aggregate.Status;
@@ -13,4 +15,7 @@ public interface ObjectionService {
 
     // 상세 조회
     ObjectionDetailResponse getObjectionDetail(int objectionId, int userId);
+
+    // 이의제기
+    ObjectionCreateResponse createObjection(ObjectionCreateRequest request, int userId);
 }
