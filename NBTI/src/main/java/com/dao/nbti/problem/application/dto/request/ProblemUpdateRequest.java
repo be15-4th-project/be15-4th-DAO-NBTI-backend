@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
 @Getter
-public class ProblemCreateRequest implements ProblemCommandRequest {
+public class ProblemUpdateRequest implements ProblemCommandRequest {
     private int categoryId;
     private int answerTypeId;
     @NotBlank
