@@ -5,6 +5,7 @@ package com.dao.nbti.user.application.service;
 import com.dao.nbti.common.exception.ErrorCode;
 import com.dao.nbti.user.application.dto.IdDuplicateResponse;
 import com.dao.nbti.user.application.dto.UserCreateRequest;
+import com.dao.nbti.user.application.dto.UserInfoResponse;
 import com.dao.nbti.user.domain.aggregate.User;
 import com.dao.nbti.user.domain.repository.UserRepository;
 import com.dao.nbti.user.exception.UserException;
@@ -47,5 +48,15 @@ public class UserService {
         return IdDuplicateResponse.builder()
                 .isDuplicate(isDuplicate)
                 .build();
+    }
+
+    public UserInfoResponse getUserInfo(String username) {
+        int userId = Integer.parseInt(username);
+        User user = userRepository.findByUserIdAndDeletedAtIsNull(userId).orElseThrow(
+                () -> new UserException(ErrorCode.USER_NOT_FOUND)
+        );
+
+        UserInfoResponse response = modelMapper.map(user, UserInfoResponse.class);
+        return response;
     }
 }
