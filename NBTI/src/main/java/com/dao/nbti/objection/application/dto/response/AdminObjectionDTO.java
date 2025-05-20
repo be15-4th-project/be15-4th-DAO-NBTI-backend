@@ -9,14 +9,14 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class AdminObjectionDTO {
-    private int userId;
+    private Integer userId;
     private String accountId;
     private int objectionId;
     private int problemId;
     private Status status;           // 상태: PENDING / ACCEPTED / REJECTED
     private LocalDateTime createdAt; // 제출 일시
 
-    public AdminObjectionDTO(int userId, String accountId, int objectionId, int problemId, Status status, LocalDateTime createdAt) {
+    public AdminObjectionDTO(Integer userId, String accountId, int objectionId, int problemId, Status status, LocalDateTime createdAt) {
         this.userId = userId;
         this.accountId = accountId;
         this.objectionId = objectionId;
