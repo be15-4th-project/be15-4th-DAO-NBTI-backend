@@ -3,8 +3,10 @@ package com.dao.nbti.common.auth.application.service;
 
 import com.dao.nbti.common.auth.application.dto.LoginRequest;
 import com.dao.nbti.common.auth.application.dto.LoginResponse;
+import com.dao.nbti.common.auth.application.dto.PasswordFindRequest;
 import com.dao.nbti.common.auth.application.dto.TokenResponse;
 import com.dao.nbti.common.auth.domain.aggregate.RefreshToken;
+import com.dao.nbti.common.auth.domain.aggregate.TempToken;
 import com.dao.nbti.common.exception.ErrorCode;
 import com.dao.nbti.common.jwt.JwtTokenProvider;
 import com.dao.nbti.user.domain.aggregate.User;
@@ -15,6 +17,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 
@@ -25,6 +28,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisTemplate<String, RefreshToken> redisTemplate;
+    private final RedisTemplate<String, TempToken> tempRedisTemplate;
 
     //각 계층별 메소드 명 작성 기준을 못찾아서 일단 login으로 합니다.
     public LoginResponse login(LoginRequest loginRequest) {
@@ -104,5 +108,30 @@ public class AuthService {
         jwtTokenProvider.validateToken(refreshToken);
         String userId = jwtTokenProvider.getUsernameFromJWT(refreshToken);
         redisTemplate.delete(userId);
+    }
+
+    @Transactional
+    public TokenResponse findPassword(PasswordFindRequest request) {
+        String accountId = request.getAccountId();
+        String name = request.getName();
+        User user = userRepository.findByAccountIdAndDeletedAtIsNullAndName(accountId,name).orElseThrow(
+                () -> new UserException(ErrorCode.USER_NOT_FOUND)
+        );
+
+        String token = jwtTokenProvider.createToken(accountId,user.getAuthority().name());
+        TempToken tempToken = TempToken.builder()
+                .token(token)
+                .build();
+
+        tempRedisTemplate.opsForValue().set(
+                accountId,
+                tempToken,
+                Duration.ofDays(7)
+        );
+
+        return TokenResponse.builder()
+                .accessToken(token)
+                .refreshToken(null)
+                .build();
     }
 }
