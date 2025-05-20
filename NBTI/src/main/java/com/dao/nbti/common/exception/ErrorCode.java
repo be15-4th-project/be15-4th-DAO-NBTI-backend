@@ -12,6 +12,7 @@ public enum ErrorCode {
     LOGIN_ID_ALREADY_EXISTS("10001", "이미 사용중인 ID 입니다.", HttpStatus.CONFLICT),
     USER_NOT_FOUND("10002","존재하지 않는 사용자입니다.",HttpStatus.NOT_FOUND),
     INVALID_CREDENTIALS("10003", "올바르지 않은 아이디 혹은 비밀번호입니다.", HttpStatus.UNAUTHORIZED),
+    PASSWORD_DISCORD("10004","비밀번호를 다시 입력해주세요",HttpStatus.BAD_REQUEST),
 
     // 학습 관련 오류 (20001 ~ 29999)
     CATEGORY_NOT_FOUND("20001", "존재하지 않는 카테고리입니다.", HttpStatus.NOT_FOUND),

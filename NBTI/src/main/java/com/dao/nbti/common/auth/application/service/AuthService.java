@@ -1,23 +1,26 @@
 package com.dao.nbti.common.auth.application.service;
 
 
-import com.dao.nbti.common.auth.application.dto.LoginRequest;
-import com.dao.nbti.common.auth.application.dto.LoginResponse;
-import com.dao.nbti.common.auth.application.dto.TokenResponse;
+import com.dao.nbti.common.auth.application.dto.*;
 import com.dao.nbti.common.auth.domain.aggregate.RefreshToken;
+import com.dao.nbti.common.auth.domain.aggregate.TempToken;
 import com.dao.nbti.common.exception.ErrorCode;
 import com.dao.nbti.common.jwt.JwtTokenProvider;
 import com.dao.nbti.user.domain.aggregate.User;
 import com.dao.nbti.user.domain.repository.UserRepository;
 import com.dao.nbti.user.exception.UserException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 
+import static com.dao.nbti.common.exception.ErrorCode.PASSWORD_DISCORD;
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -25,6 +28,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisTemplate<String, RefreshToken> redisTemplate;
+    private final RedisTemplate<String, TempToken> tempRedisTemplate;
 
     //각 계층별 메소드 명 작성 기준을 못찾아서 일단 login으로 합니다.
     public LoginResponse login(LoginRequest loginRequest) {
@@ -104,5 +108,53 @@ public class AuthService {
         jwtTokenProvider.validateToken(refreshToken);
         String userId = jwtTokenProvider.getUsernameFromJWT(refreshToken);
         redisTemplate.delete(userId);
+    }
+
+    @Transactional
+    public TokenResponse findPassword(PasswordFindRequest request) {
+        String accountId = request.getAccountId();
+        String name = request.getName();
+        User user = userRepository.findByAccountIdAndDeletedAtIsNullAndName(accountId,name).orElseThrow(
+                () -> new UserException(ErrorCode.USER_NOT_FOUND)
+        );
+
+        String token = jwtTokenProvider.createToken(String.valueOf(user.getUserId()),null);
+        TempToken tempToken = TempToken.builder()
+                    .token(token)
+                    .build();
+
+        tempRedisTemplate.opsForValue().set(
+                "temp "+user.getUserId(),
+                    tempToken,
+                Duration.ofMinutes(5)
+        );
+
+        return TokenResponse.builder()
+                .accessToken(token)
+                .refreshToken(null)
+                .build();
+    }
+
+    @Transactional
+    public void resetPassword(PasswordResetRequest request,String userIdStr) {
+        String password = request.getPassword();
+        String verifiedPassword = request.getVerifiedPassword();
+        if(!password.equals(verifiedPassword)){
+            throw new UserException(PASSWORD_DISCORD);
+        }
+        log.info("2");
+
+        TempToken tempToken = tempRedisTemplate.opsForValue().get("temp "+userIdStr);
+        if (tempToken == null) {
+            throw new BadCredentialsException("해당 유저로 조회되는 토큰 없음");
+        }
+        tempRedisTemplate.delete("temp " + userIdStr);
+
+        User user = userRepository.findByUserIdAndDeletedAtIsNull(Integer.parseInt(userIdStr)).orElseThrow(
+                () -> new UserException(ErrorCode.USER_NOT_FOUND)
+        );
+
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
     }
 }
