@@ -33,7 +33,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class StudyService {
 
@@ -181,11 +180,9 @@ public class StudyService {
 
     @Transactional(readOnly = true)
     public StudySummaryListResponseDto getStudySummaries(StudySearchRequestDto request) {
-        log.info("{}", request.getPage());
         List<StudySummaryDto> list = studyRepositoryCustom.getStudySummaries(request);
-        log.info("{}", list);
         long total = studyRepositoryCustom.countStudySummaries(request);
-        log.info("{}", total);
+
         return StudySummaryListResponseDto.builder()
                 .studies(list)
                 .pagination(Pagination.builder()

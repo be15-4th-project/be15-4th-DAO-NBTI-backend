@@ -19,7 +19,6 @@ public class StudyRepositoryImpl implements StudyRepositoryCustom {
 
     @Override
     public List<StudySummaryDto> getStudySummaries(StudySearchRequestDto request) {
-        System.out.println(request.getPage());
         String baseQuery = """
             SELECT new com.dao.nbti.study.application.dto.response.StudySummaryDto(
                 s.studyId, s.userId, s.createdAt, pc.name, COUNT(sr)
@@ -40,10 +39,7 @@ public class StudyRepositoryImpl implements StudyRepositoryCustom {
         query.setParameter("isCorrect", IsCorrect.Y);
         query.setParameter("isDeleted", IsDeleted.N);
         setParams(query, request);
-        System.out.println(request);
-        System.out.println(request.getPage());
-        System.out.println(request.getOffset());
-        System.out.println(request.getLimit());
+
         return query.setFirstResult(request.getOffset())
                 .setMaxResults(request.getLimit())
                 .getResultList();
