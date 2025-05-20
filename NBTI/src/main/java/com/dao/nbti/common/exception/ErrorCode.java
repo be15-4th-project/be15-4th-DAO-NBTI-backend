@@ -32,6 +32,9 @@ public enum ErrorCode {
     UNAUTHORIZED_OBJECTION_ACCESS("40002", "본인의 이의 제기만 조회할 수 있습니다.", HttpStatus.FORBIDDEN),
     DUPLICATE_OBJECTION("40003", "이미 해당 문제에 대해 이의 제기를 제출했습니다.", HttpStatus.CONFLICT),
     INVALID_OBJECTION_TARGET("40004", "해당 문제는 사용자가 학습하지 않은 항목입니다.", HttpStatus.BAD_REQUEST),
+    OBJECTION_ALREADY_UPDATED("40005", "이미 처리 완료된 이의 제기입니다.", HttpStatus.BAD_REQUEST),
+    INVALID_STATUS("40006", "변경할 상태는 승인 또는 반려여야 합니다.", HttpStatus.BAD_REQUEST),
+    REJECTION_REASON_REQUIRED("40007", "반려 사유를 입력해야 합니다.", HttpStatus.BAD_REQUEST),
 
     // 공통 오류
     VALIDATION_ERROR("90001", "입력 값 검증 오류입니다.", HttpStatus.BAD_REQUEST),
