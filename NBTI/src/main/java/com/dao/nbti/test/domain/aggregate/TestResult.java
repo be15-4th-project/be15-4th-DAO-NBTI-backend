@@ -46,6 +46,7 @@ public class TestResult {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(name = "is_saved")
+    @Enumerated(EnumType.STRING)
     private IsSaved isSaved = IsSaved.N;
 
     @Builder
@@ -62,7 +63,7 @@ public class TestResult {
         this.spatialPerception = spatialPerception;
         this.aiText = aiText;
         this.createdAt = createdAt;
-        this.isSaved = isSaved;
+        this.isSaved = isSaved != null ? isSaved : IsSaved.N;
     }
 
     public void saveToMyPage() {

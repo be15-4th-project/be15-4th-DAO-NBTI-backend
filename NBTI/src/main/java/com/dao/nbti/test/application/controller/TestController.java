@@ -36,4 +36,19 @@ public class TestController {
 
         return ResponseEntity.ok(ApiResponse.success(null));
     }
+
+    /* 검사 결과 마이페이지에 저장하기 */
+    @PutMapping("/result/my-page")
+    @Operation(
+            summary = "지능 검사 결과 마이페이지에 저장하기", description = "회원의 지능 검사 결과를 마이페이지에 저장합니다."
+    )
+    public ResponseEntity<ApiResponse<Void>> updateTestResult(
+            @AuthenticationPrincipal User user
+    ){
+
+        // 로그인 된 회원만 바꿀 수 있음
+        testService.updateTestResult(user.getUserId());
+
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
 }

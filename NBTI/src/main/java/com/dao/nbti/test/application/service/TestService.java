@@ -6,4 +6,6 @@ public interface TestService {
 
     void createTestResult(TestResultCreateRequest testResultCreateRequest, Integer userId);
 
+    void updateTestResult(Integer userId);
+
 }
