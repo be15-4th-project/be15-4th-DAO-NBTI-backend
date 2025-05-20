@@ -9,6 +9,8 @@ import com.dao.nbti.objection.domain.aggregate.Objection;
 import com.dao.nbti.objection.domain.aggregate.Status;
 import com.dao.nbti.objection.domain.repository.ObjectionRepository;
 import com.dao.nbti.objection.exception.ObjectionException;
+import com.dao.nbti.problem.domain.aggregate.IsDeleted;
+import com.dao.nbti.problem.domain.aggregate.Problem;
 import com.dao.nbti.problem.domain.repository.ProblemRepository;
 import com.dao.nbti.study.domain.repository.StudyResultRepository;
 import lombok.RequiredArgsConstructor;
@@ -60,9 +62,12 @@ public class ObjectionServiceImpl implements ObjectionService {
     public ObjectionCreateResponse createObjection(ObjectionCreateRequest request, int userId) {
         int problemId = request.getProblemId();
 
-        // 1. 문제 존재 여부 확인
-        if (!problemRepository.existsById(problemId)) {
-            throw new ObjectionException(ErrorCode.PROBLEM_NOT_FOUND);
+        // 1. 문제 존재 여부 및 삭제 여부 확인
+        Problem problem = problemRepository.findById(problemId)
+                .orElseThrow(() -> new ObjectionException(ErrorCode.PROBLEM_NOT_FOUND));
+
+        if (problem.getIsDeleted() == IsDeleted.Y) {
+            throw new ObjectionException(ErrorCode.PROBLEM_DELETED);
         }
 
         // 2. 중복 이의 제기 방지
