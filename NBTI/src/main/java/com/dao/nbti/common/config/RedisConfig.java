@@ -40,9 +40,9 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, RefreshToken> redisTemplate() {
+    public RedisTemplate<String, RefreshToken> redisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, RefreshToken> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(redisConnectionFactory());
+        redisTemplate.setConnectionFactory(connectionFactory);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
 //        redisTemplate.setValueSerializer(new StringRedisSerializer());
 
@@ -52,9 +52,9 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, TempToken> TempRedisTemplate() {
+    public RedisTemplate<String, TempToken> tempRedisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, TempToken> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(redisConnectionFactory());
+        redisTemplate.setConnectionFactory(connectionFactory);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
 //        redisTemplate.setValueSerializer(new StringRedisSerializer());
 
