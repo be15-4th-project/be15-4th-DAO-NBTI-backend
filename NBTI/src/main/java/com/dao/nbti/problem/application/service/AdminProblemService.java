@@ -148,4 +148,23 @@ public class AdminProblemService {
                 .problemId(problemId)
                 .build();
     }
+
+    public CategoryResponse getCategories() {
+        List<Category> parentCategories = categoryRepository.findByParentCategoryIdIsNullOrderByCategoryIdAsc();
+
+        List<CategorySummaryDTO> parentCategoryList = parentCategories.stream()
+                .map(CategorySummaryDTO::fromCategory)
+                .toList();
+
+        List<Category> childCategories = categoryRepository.findByParentCategoryIdIsNotNullOrderByParentCategoryIdAscCategoryIdAsc();
+
+        List<CategorySummaryDTO> childCategoryList = childCategories.stream()
+                .map(CategorySummaryDTO::fromCategory)
+                .toList();
+
+        return CategoryResponse.builder()
+                .parentCategories(parentCategoryList)
+                .childCategories(childCategoryList)
+                .build();
+    }
 }

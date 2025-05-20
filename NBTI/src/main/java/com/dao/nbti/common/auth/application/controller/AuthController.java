@@ -1,16 +1,14 @@
 package com.dao.nbti.common.auth.application.controller;
 
-import com.dao.nbti.common.auth.application.dto.LoginRequest;
-import com.dao.nbti.common.auth.application.dto.LoginResponse;
-import com.dao.nbti.common.auth.application.dto.TokenResponse;
+import com.dao.nbti.common.auth.application.dto.*;
 import com.dao.nbti.common.auth.application.service.AuthService;
 import com.dao.nbti.common.dto.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
@@ -60,6 +58,24 @@ public class AuthController {
                 .header(HttpHeaders.SET_COOKIE, deleteCookie.toString())
                 .body(ApiResponse.success(null));
     }
+
+    @Operation(summary = "비밀번호 찾기", description = "사용자는 아이디와 이름을 입력하여 비밀번호 변경을 요청한다.")
+    @GetMapping("/find-password")
+    public ResponseEntity<ApiResponse<TokenResponse>> requestPasswordReset(@RequestBody PasswordFindRequest request){
+        TokenResponse response = authService.findPassword(request);
+
+        return ResponseEntity.ok()
+                .body(ApiResponse.success(response));
+    }
+
+    @Operation(summary = "비밀번호 재설정", description = "사용자의 이름과 아이디 정보가 일치할 시 비밀번호를 재설정한다.")
+    @GetMapping("/reset-password")
+    public ResponseEntity<ApiResponse<Void>> resetPassword(@RequestBody @Valid PasswordResetRequest request, @AuthenticationPrincipal UserDetails userDetails){
+        authService.resetPassword(request, userDetails.getUsername());
+
+        return ResponseEntity.ok().body(ApiResponse.success(null));
+    }
+
 
     private ResponseCookie createRefreshTokenCookie(String refreshToken) {
         return ResponseCookie.from("refreshToken", refreshToken)

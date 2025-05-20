@@ -2,16 +2,20 @@ package com.dao.nbti.user.application.controller;
 
 import com.dao.nbti.common.dto.ApiResponse;
 import com.dao.nbti.common.exception.ErrorCode;
-import com.dao.nbti.user.application.dto.IdDuplicateResponse;
-import com.dao.nbti.user.application.dto.UserCreateRequest;
+import com.dao.nbti.user.application.dto.*;
 import com.dao.nbti.user.application.service.UserService;
+import com.dao.nbti.user.domain.aggregate.IsDeleted;
 import com.dao.nbti.user.exception.UserException;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,7 +25,7 @@ public class UserController {
     private final UserService userService;
     @Operation(summary = "회원가입", description = "사용자는 사용자 정보를 입력하여 회원가입 할 수 있다.")
     @GetMapping("/signup")
-    public ResponseEntity<ApiResponse<Void>> signup(@RequestBody UserCreateRequest userCreateRequest){
+    public ResponseEntity<ApiResponse<Void>> signup(@RequestBody @Valid UserCreateRequest userCreateRequest){
         userService.createUser(userCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(null));
     }
@@ -42,6 +46,23 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
+    @Operation(summary = "회원 정보 조회", description = "회원은 자신의 아이디, 이름, 생년월일, 성별, 포인트 등의 정보를 조회 및 필터링할 수 있다.")
+    @GetMapping("/info")
+    public ResponseEntity<ApiResponse<UserInfoResponse>> getUserInfo(@AuthenticationPrincipal UserDetails userDetails){
+        UserInfoResponse response = userService.getUserInfo(userDetails.getUsername());
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @Operation(summary = "회원 목록 조회", description = "관리자는 전체 회원 목록을 조회하고 필터/검색 기능을 이용할 수 있다.")
+    @GetMapping("/list")
+    public ResponseEntity<ApiResponse<UserAdminViewResponse>> getUserList(
+            @RequestParam(required = false) String accountId,
+            @RequestParam(required = false) String isDeleted,
+            @PageableDefault(sort="userId") Pageable pageable){
+        UserSearchCondition condition = new UserSearchCondition(accountId,IsDeleted.valueOf(isDeleted));
+        UserAdminViewResponse response = userService.getUserList(condition, pageable);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
 
     @ExceptionHandler(UserException.class)
     public ResponseEntity<ApiResponse<Void>> handleUserException(UserException e) {
