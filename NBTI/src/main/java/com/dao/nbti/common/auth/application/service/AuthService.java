@@ -10,6 +10,9 @@ import com.dao.nbti.user.domain.aggregate.User;
 import com.dao.nbti.user.domain.repository.UserRepository;
 import com.dao.nbti.user.exception.UserException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 
 import static com.dao.nbti.common.exception.ErrorCode.PASSWORD_DISCORD;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -117,15 +120,15 @@ public class AuthService {
                 () -> new UserException(ErrorCode.USER_NOT_FOUND)
         );
 
-        String token = jwtTokenProvider.createToken("temp "+accountId,user.getAuthority().name());
+        String token = jwtTokenProvider.createToken(String.valueOf(user.getUserId()),null);
         TempToken tempToken = TempToken.builder()
-                .token(token)
-                .build();
+                    .token(token)
+                    .build();
 
         tempRedisTemplate.opsForValue().set(
-                accountId,
-                tempToken,
-                60*5L
+                "temp "+user.getUserId(),
+                    tempToken,
+                Duration.ofMinutes(5)
         );
 
         return TokenResponse.builder()
@@ -134,17 +137,26 @@ public class AuthService {
                 .build();
     }
 
-    public void resetPassword(PasswordResetRequest request,String username) {
+    @Transactional
+    public void resetPassword(PasswordResetRequest request,String userIdStr) {
         String password = request.getPassword();
         String verifiedPassword = request.getVerifiedPassword();
         if(!password.equals(verifiedPassword)){
             throw new UserException(PASSWORD_DISCORD);
         }
+        log.info("2");
 
-        User user = userRepository.findByUserIdAndDeletedAtIsNull(Integer.parseInt(username)).orElseThrow(
+        TempToken tempToken = tempRedisTemplate.opsForValue().get("temp "+userIdStr);
+        if (tempToken == null) {
+            throw new BadCredentialsException("해당 유저로 조회되는 토큰 없음");
+        }
+        tempRedisTemplate.delete("temp " + userIdStr);
+
+        User user = userRepository.findByUserIdAndDeletedAtIsNull(Integer.parseInt(userIdStr)).orElseThrow(
                 () -> new UserException(ErrorCode.USER_NOT_FOUND)
         );
 
         user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
     }
 }
