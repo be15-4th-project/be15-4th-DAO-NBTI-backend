@@ -27,12 +27,16 @@ public enum ErrorCode {
     // 검사 결과 오류 (30000 ~ 39999)
     TEST_RESULT_NOT_FOUND("30001", "검사 결과를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     UNAUTHORIZED_TEST_RESULT_ACCESS("30002", "본인의 검사 결과만 조회할 수 있습니다.", HttpStatus.FORBIDDEN),
+    AI_CALL_FAILED("30003", "ai 호출에 실패했습니다.", HttpStatus.BAD_GATEWAY),
 
     // 이의 제기 오류 (40000 ~ 49999)
     OBJECTION_NOT_FOUND("40001", "이의 제기 항목을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     UNAUTHORIZED_OBJECTION_ACCESS("40002", "본인의 이의 제기만 조회할 수 있습니다.", HttpStatus.FORBIDDEN),
     DUPLICATE_OBJECTION("40003", "이미 해당 문제에 대해 이의 제기를 제출했습니다.", HttpStatus.CONFLICT),
     INVALID_OBJECTION_TARGET("40004", "해당 문제는 사용자가 학습하지 않은 항목입니다.", HttpStatus.BAD_REQUEST),
+    OBJECTION_ALREADY_UPDATED("40005", "이미 처리 완료된 이의 제기입니다.", HttpStatus.BAD_REQUEST),
+    INVALID_STATUS("40006", "변경할 상태는 승인 또는 반려여야 합니다.", HttpStatus.BAD_REQUEST),
+    REJECTION_REASON_REQUIRED("40007", "반려 사유를 입력해야 합니다.", HttpStatus.BAD_REQUEST),
 
     // 공통 오류
     VALIDATION_ERROR("90001", "입력 값 검증 오류입니다.", HttpStatus.BAD_REQUEST),

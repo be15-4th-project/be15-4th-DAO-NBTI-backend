@@ -1,5 +1,6 @@
 package com.dao.nbti.objection.domain.aggregate;
 
+import com.dao.nbti.objection.application.dto.request.ObjectionUpdateRequest;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -41,4 +42,12 @@ public class Objection {
     private LocalDateTime processedAt;
 
     private String information;
+
+    public void updateFromRequest(ObjectionUpdateRequest objectionUpdateRequest) {
+        Status status = objectionUpdateRequest.getStatus();
+        String information = objectionUpdateRequest.getInformation();
+        this.status = status;
+        this.information = information;
+        this.processedAt = LocalDateTime.now();
+    }
 }
