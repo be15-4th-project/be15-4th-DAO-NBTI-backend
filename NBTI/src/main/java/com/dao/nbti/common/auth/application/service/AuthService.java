@@ -126,7 +126,7 @@ public class AuthService {
         tempRedisTemplate.opsForValue().set(
                 accountId,
                 tempToken,
-                Duration.ofDays(7)
+                60*5L
         );
 
         return TokenResponse.builder()
