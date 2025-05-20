@@ -1,8 +1,13 @@
 package com.dao.nbti.test.application.service;
 
+import com.dao.nbti.problem.domain.repository.AnswerTypeRepository;
+import com.dao.nbti.problem.domain.repository.CategoryRepository;
+import com.dao.nbti.problem.domain.repository.ProblemRepository;
 import com.dao.nbti.test.application.dto.request.TestResultCreateRequest;
 import com.dao.nbti.test.domain.repository.TestProblemRepository;
 import com.dao.nbti.test.domain.repository.TestResultRepository;
+import com.dao.nbti.user.domain.repository.UserRepository;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,15 +22,13 @@ class TestServiceImplTest {
     private TestResultRepository testResultRepository;
 
     @Mock
-    private TestProblemRepository testProblemRepository;
-
-    @Mock
     private TestAiAnswerService testAiAnswerService;
 
     @InjectMocks
     private TestServiceImpl testService;
 
     @Test
+    @DisplayName("검사 결과 저장하기")
     void createTestResult() {
         Integer userId = 1;
         TestResultCreateRequest request = new TestResultCreateRequest
@@ -46,6 +49,7 @@ class TestServiceImplTest {
     }
 
     @Test
+    @DisplayName("검사 결과 마이페이지에 저장하기")
     void saveTestResult() {
         Integer userId = 1;
         TestResultCreateRequest request = new TestResultCreateRequest(4, 5, 3, 6, 2, 1); // 생성자 또는 빌더로 채워줘야 함
@@ -62,6 +66,4 @@ class TestServiceImplTest {
                         && testResult.getGeneralKnowledge() == 5
         ));
     }
-
-
 }
