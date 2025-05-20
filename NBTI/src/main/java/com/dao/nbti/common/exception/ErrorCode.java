@@ -16,7 +16,7 @@ public enum ErrorCode {
     // 학습 관련 오류 (20001 ~ 29999)
     CATEGORY_NOT_FOUND("20001", "존재하지 않는 카테고리입니다.", HttpStatus.NOT_FOUND),
     ANSWER_TYPE_NOT_FOUND("20002", "존재하지 않는 답안 유형입니다.", HttpStatus.NOT_FOUND),
-    PROBLEM_NOT_FOUND("20003", "해당하는 조건의 문제가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
+    PROBLEM_NOT_FOUND("20003", "해당하는 문제가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
     PARENT_CATEGORY_NOT_FOUND("20004", "상위 분야를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     PROBLEM_DELETED("20005", "삭제된 문제입니다.", HttpStatus.GONE),
 

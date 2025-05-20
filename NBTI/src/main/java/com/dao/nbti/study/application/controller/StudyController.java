@@ -2,14 +2,19 @@ package com.dao.nbti.study.application.controller;
 
 import com.dao.nbti.common.dto.ApiResponse;
 import com.dao.nbti.common.exception.ErrorCode;
+import com.dao.nbti.study.application.dto.request.SubmitStudyRequestDto;
 import com.dao.nbti.study.application.dto.response.ProblemResponseDto;
+import com.dao.nbti.study.application.dto.response.SubmitStudyResponseDto;
 import com.dao.nbti.study.application.service.StudyService;
 import com.dao.nbti.study.exception.NoSuchAnswerTypeException;
 import com.dao.nbti.study.exception.NoSuchCategoryException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,6 +36,18 @@ public class StudyController {
         List<ProblemResponseDto> problems = studyService.getProblems(categoryId, level);
         return ResponseEntity.ok(ApiResponse.success(problems));
     }
+
+    @PostMapping("/submit")
+    @Operation(summary = "학습 제출", description = "제출된 문제 답안을 채점하고 학습을 기록하며 1포인트를 지급합니다.")
+    public ResponseEntity<ApiResponse<SubmitStudyResponseDto>> submitAnswers(
+            @RequestBody @Valid SubmitStudyRequestDto request,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        int userId = Integer.parseInt(userDetails.getUsername());
+        SubmitStudyResponseDto response = studyService.gradeAndSaveResults(userId, request);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
 
     @ExceptionHandler(NoSuchCategoryException.class)
     public ResponseEntity<ApiResponse<Void>> handleNoSuchCategoryException(NoSuchCategoryException e) {
