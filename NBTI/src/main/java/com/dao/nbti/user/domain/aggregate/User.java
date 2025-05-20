@@ -10,13 +10,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString
 @Entity
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int userId;
     private String accountId;
+    @Setter
     private String password;
     private String name;
     @Enumerated(EnumType.STRING)
@@ -30,11 +30,13 @@ public class User {
     private IsDeleted isDeleted = IsDeleted.N;
     private LocalDateTime deletedAt =null;
 
-    public void setEncodedPassword(String encodedPassword) {
-        this.password = encodedPassword;
+    public void delete() {
+        this.deletedAt = LocalDateTime.now();
+        this.isDeleted = IsDeleted.Y;
     }
 
     public void addPoint() {
         this.point += 1;
     }
+
 }

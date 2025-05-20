@@ -17,10 +17,12 @@ public class Study {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "study_id")
     private int studyId;
 
+    @Column(name = "user_id")
     private Integer userId;
 
-    @Column(insertable = false)
+    @Column(name = "created_at", nullable = false, insertable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 }
