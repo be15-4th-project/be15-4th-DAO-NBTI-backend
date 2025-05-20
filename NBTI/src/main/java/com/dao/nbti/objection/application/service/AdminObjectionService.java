@@ -3,11 +3,10 @@ package com.dao.nbti.objection.application.service;
 import com.dao.nbti.common.dto.Pagination;
 import com.dao.nbti.common.exception.ErrorCode;
 import com.dao.nbti.objection.application.dto.request.AdminObjectionSearchRequest;
-import com.dao.nbti.objection.application.dto.response.AdminObjectionDTO;
-import com.dao.nbti.objection.application.dto.response.AdminObjectionDetailResponse;
-import com.dao.nbti.objection.application.dto.response.AdminObjectionDetailsDTO;
-import com.dao.nbti.objection.application.dto.response.AdminObjectionListResponse;
+import com.dao.nbti.objection.application.dto.request.ObjectionUpdateRequest;
+import com.dao.nbti.objection.application.dto.response.*;
 import com.dao.nbti.objection.domain.aggregate.Objection;
+import com.dao.nbti.objection.domain.aggregate.Status;
 import com.dao.nbti.objection.domain.repository.ObjectionRepository;
 import com.dao.nbti.objection.domain.repository.ObjectionRepositoryCustom;
 import com.dao.nbti.objection.exception.ObjectionException;
@@ -68,5 +67,44 @@ public class AdminObjectionService {
         return AdminObjectionDetailResponse.builder()
                 .objectionDetails(objectionDetails)
                 .build();
+    }
+
+    @Transactional
+    public ObjectionUpdateResponse updateObjection(int objectionId, ObjectionUpdateRequest objectionUpdateRequest) {
+        Objection objection = objectionRepository.findById(objectionId)
+                .orElseThrow(() -> new ObjectionException(ErrorCode.OBJECTION_NOT_FOUND));
+
+        Status status = objection.getStatus();
+        if (status != Status.PENDING) {
+            throw new ObjectionException(ErrorCode.OBJECTION_ALREADY_UPDATED);
+        }
+        validateUpdateRequest(objectionUpdateRequest);
+
+        objection.updateFromRequest(objectionUpdateRequest);
+
+        String message = "이의 제기가 %s되었습니다.";
+        Status requestedStatus = objection.getStatus();
+        switch (requestedStatus) {
+            // PENDING이면 검증 메서드에서 예외 처리됨
+            case ACCEPTED -> message = message.formatted("승인");
+            case REJECTED -> message = message.formatted("반려");
+        }
+
+        return ObjectionUpdateResponse.builder()
+                .objectionId(objectionId)
+                .message(message)
+                .build();
+    }
+
+    private void validateUpdateRequest(ObjectionUpdateRequest objectionUpdateRequest) {
+        Status requestedStatus = objectionUpdateRequest.getStatus();
+        String information = objectionUpdateRequest.getInformation();
+
+        if (requestedStatus == Status.PENDING) {
+            throw new ObjectionException(ErrorCode.INVALID_STATUS);
+        }
+        if (requestedStatus == Status.REJECTED && information.isBlank()) {
+            throw new ObjectionException(ErrorCode.REJECTION_REASON_REQUIRED);
+        }
     }
 }
