@@ -11,6 +11,7 @@ import com.dao.nbti.objection.domain.aggregate.Objection;
 import com.dao.nbti.objection.domain.repository.ObjectionRepository;
 import com.dao.nbti.objection.domain.repository.ObjectionRepositoryCustom;
 import com.dao.nbti.objection.exception.ObjectionException;
+import com.dao.nbti.user.domain.aggregate.IsDeleted;
 import com.dao.nbti.user.domain.aggregate.User;
 import com.dao.nbti.user.domain.repository.UserRepository;
 import com.dao.nbti.user.exception.UserException;
@@ -56,6 +57,9 @@ public class AdminObjectionService {
                     .orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND));
 
             objectionDetails = AdminObjectionDetailsDTO.from(objection, user.getAccountId());
+            if (user.getIsDeleted() == IsDeleted.Y) {
+                objectionDetails = AdminObjectionDetailsDTO.from(objection, "삭제된 유저");
+            }
         }
         else {
             objectionDetails = AdminObjectionDetailsDTO.from(objection, "삭제된 유저");
