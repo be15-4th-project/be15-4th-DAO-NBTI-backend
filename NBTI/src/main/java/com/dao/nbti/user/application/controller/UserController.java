@@ -2,14 +2,15 @@ package com.dao.nbti.user.application.controller;
 
 import com.dao.nbti.common.dto.ApiResponse;
 import com.dao.nbti.common.exception.ErrorCode;
-import com.dao.nbti.user.application.dto.IdDuplicateResponse;
-import com.dao.nbti.user.application.dto.UserCreateRequest;
-import com.dao.nbti.user.application.dto.UserInfoResponse;
+import com.dao.nbti.user.application.dto.*;
 import com.dao.nbti.user.application.service.UserService;
+import com.dao.nbti.user.domain.aggregate.IsDeleted;
 import com.dao.nbti.user.exception.UserException;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -49,6 +50,17 @@ public class UserController {
     @GetMapping("/info")
     public ResponseEntity<ApiResponse<UserInfoResponse>> getUserInfo(@AuthenticationPrincipal UserDetails userDetails){
         UserInfoResponse response = userService.getUserInfo(userDetails.getUsername());
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @Operation(summary = "회원 목록 조회", description = "관리자는 전체 회원 목록을 조회하고 필터/검색 기능을 이용할 수 있다.")
+    @GetMapping("/list")
+    public ResponseEntity<ApiResponse<UserAdminViewResponse>> getUserList(
+            @RequestParam(required = false) String accountId,
+            @RequestParam(required = false) String isDeleted,
+            @PageableDefault(sort="userId") Pageable pageable){
+        UserSearchCondition condition = new UserSearchCondition(accountId,IsDeleted.valueOf(isDeleted));
+        UserAdminViewResponse response = userService.getUserList(condition, pageable);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
