@@ -1,5 +1,6 @@
 package com.dao.nbti.study.application.service;
 
+import com.dao.nbti.common.dto.Pagination;
 import com.dao.nbti.common.exception.ErrorCode;
 import com.dao.nbti.problem.domain.aggregate.AnswerType;
 import com.dao.nbti.problem.domain.aggregate.Category;
@@ -7,15 +8,14 @@ import com.dao.nbti.problem.domain.aggregate.Problem;
 import com.dao.nbti.problem.domain.repository.AnswerTypeRepository;
 import com.dao.nbti.problem.domain.repository.CategoryRepository;
 import com.dao.nbti.problem.domain.repository.ProblemRepository;
+import com.dao.nbti.study.application.dto.request.StudySearchRequestDto;
 import com.dao.nbti.study.application.dto.request.SubmitStudyRequestDto;
-import com.dao.nbti.study.application.dto.response.ProblemResponseDto;
-import com.dao.nbti.study.application.dto.response.StudyCategoryListResponseDto;
-import com.dao.nbti.study.application.dto.response.StudyResultDetailResponseDto;
-import com.dao.nbti.study.application.dto.response.SubmitStudyResponseDto;
+import com.dao.nbti.study.application.dto.response.*;
 import com.dao.nbti.study.domain.aggregate.IsCorrect;
 import com.dao.nbti.study.domain.aggregate.Study;
 import com.dao.nbti.study.domain.aggregate.StudyResult;
 import com.dao.nbti.study.domain.repository.StudyRepository;
+import com.dao.nbti.study.domain.repository.StudyRepositoryCustom;
 import com.dao.nbti.study.domain.repository.StudyResultRepository;
 import com.dao.nbti.study.exception.*;
 import com.dao.nbti.user.domain.aggregate.Authority;
@@ -24,6 +24,7 @@ import com.dao.nbti.user.domain.aggregate.PointType;
 import com.dao.nbti.user.domain.repository.PointHistoryRepository;
 import com.dao.nbti.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,10 +33,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class StudyService {
 
     private final StudyRepository studyRepository;
+    private final StudyRepositoryCustom studyRepositoryCustom;
     private final StudyResultRepository studyResultRepository;
     private final ProblemRepository problemRepository;
     private final CategoryRepository categoryRepository;
@@ -175,5 +178,23 @@ public class StudyService {
                 .results(resultItems)
                 .build();
     }
+
+    @Transactional(readOnly = true)
+    public StudySummaryListResponseDto getStudySummaries(StudySearchRequestDto request) {
+        log.info("{}", request.getPage());
+        List<StudySummaryDto> list = studyRepositoryCustom.getStudySummaries(request);
+        log.info("{}", list);
+        long total = studyRepositoryCustom.countStudySummaries(request);
+        log.info("{}", total);
+        return StudySummaryListResponseDto.builder()
+                .studies(list)
+                .pagination(Pagination.builder()
+                        .currentPage(request.getPage())
+                        .totalItems(total)
+                        .totalPage((int) Math.ceil((double) total / request.getSize()))
+                        .build())
+                .build();
+    }
+
 
 }
