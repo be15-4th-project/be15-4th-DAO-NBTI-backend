@@ -31,7 +31,7 @@ public class TestRepositoryCustomImpl implements TestRepositoryCustom {
         TypedQuery<AccountTestResultDto> query = em.createQuery(jpql, AccountTestResultDto.class);
 
         if (condition.getYear() != null) {
-            query.setParameter("yaer",condition.getYear());
+            query.setParameter("year",condition.getYear());
         }
 
         if (condition.getMonth() != null) {
@@ -60,7 +60,7 @@ public class TestRepositoryCustomImpl implements TestRepositoryCustom {
         TypedQuery<Long> query = em.createQuery(jpql, Long.class);
 
         if (condition.getYear() != null) {
-            query.setParameter("yaer",condition.getYear());
+            query.setParameter("year",condition.getYear());
         }
 
         if (condition.getMonth() != null) {
