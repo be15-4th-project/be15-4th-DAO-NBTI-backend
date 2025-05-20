@@ -15,6 +15,8 @@ import com.dao.nbti.problem.domain.repository.ProblemRepository;
 import com.dao.nbti.study.domain.repository.StudyResultRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,18 +30,17 @@ public class ObjectionServiceImpl implements ObjectionService {
     private final StudyResultRepository studyResultRepository;
 
     @Override
-    public List<ObjectionSummaryResponse> getObjectionsByUser(int userId, Status status) {
-        List<Objection> objections = (status == null)
-                ? objectionRepository.findByUserId(userId)
-                : objectionRepository.findByUserIdAndStatus(userId, status);
+    public Page<ObjectionSummaryResponse> getObjectionsByUser(int userId, Status status, Pageable pageable) {
+        Page<Objection> objections = (status == null)
+                ? objectionRepository.findByUserId(userId, pageable)
+                : objectionRepository.findByUserIdAndStatus(userId, status, pageable);
 
-        return objections.stream().map(o -> ObjectionSummaryResponse.builder()
+        return objections.map(o -> ObjectionSummaryResponse.builder()
                 .objectionId(o.getObjectionId())
                 .problemId(o.getProblemId())
                 .status(o.getStatus())
                 .createdAt(o.getCreatedAt())
-                .build()
-        ).toList();
+                .build());
     }
 
     @Override
