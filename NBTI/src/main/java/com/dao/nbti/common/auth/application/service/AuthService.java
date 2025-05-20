@@ -118,7 +118,7 @@ public class AuthService {
                 () -> new UserException(ErrorCode.USER_NOT_FOUND)
         );
 
-        String token = jwtTokenProvider.createToken(accountId,user.getAuthority().name());
+        String token = jwtTokenProvider.createToken("temp "+accountId,user.getAuthority().name());
         TempToken tempToken = TempToken.builder()
                 .token(token)
                 .build();
