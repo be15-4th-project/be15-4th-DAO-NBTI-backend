@@ -1,10 +1,7 @@
 package com.dao.nbti.common.auth.application.service;
 
 
-import com.dao.nbti.common.auth.application.dto.LoginRequest;
-import com.dao.nbti.common.auth.application.dto.LoginResponse;
-import com.dao.nbti.common.auth.application.dto.PasswordFindRequest;
-import com.dao.nbti.common.auth.application.dto.TokenResponse;
+import com.dao.nbti.common.auth.application.dto.*;
 import com.dao.nbti.common.auth.domain.aggregate.RefreshToken;
 import com.dao.nbti.common.auth.domain.aggregate.TempToken;
 import com.dao.nbti.common.exception.ErrorCode;
@@ -20,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
+
+import static com.dao.nbti.common.exception.ErrorCode.PASSWORD_DISCORD;
 
 @Service
 @RequiredArgsConstructor
@@ -133,5 +132,19 @@ public class AuthService {
                 .accessToken(token)
                 .refreshToken(null)
                 .build();
+    }
+
+    public void resetPassword(PasswordResetRequest request,String username) {
+        String password = request.getPassword();
+        String verifiedPassword = request.getVerifiedPassword();
+        if(!password.equals(verifiedPassword)){
+            throw new UserException(PASSWORD_DISCORD);
+        }
+
+        User user = userRepository.findByUserIdAndDeletedAtIsNull(Integer.parseInt(username)).orElseThrow(
+                () -> new UserException(ErrorCode.USER_NOT_FOUND)
+        );
+
+        user.setPassword(passwordEncoder.encode(password));
     }
 }
