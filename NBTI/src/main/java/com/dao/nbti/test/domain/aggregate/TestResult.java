@@ -45,10 +45,13 @@ public class TestResult {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(name = "is_saved")
+    private IsSaved isSaved = IsSaved.N;
+
     @Builder
     public TestResult(
             Integer userId, int langComp, int generalKnowledge, int percReason, int workMemory,
-            int procSpeed, int spatialPerception, String aiText, LocalDateTime createdAt
+            int procSpeed, int spatialPerception, String aiText, LocalDateTime createdAt, IsSaved isSaved
     ) {
         this.userId = userId;
         this.langComp = langComp;
@@ -59,6 +62,11 @@ public class TestResult {
         this.spatialPerception = spatialPerception;
         this.aiText = aiText;
         this.createdAt = createdAt;
+        this.isSaved = isSaved;
+    }
+
+    public void saveToMyPage() {
+        this.isSaved = IsSaved.Y;
     }
 
 }
