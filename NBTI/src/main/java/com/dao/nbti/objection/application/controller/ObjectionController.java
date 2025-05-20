@@ -1,6 +1,7 @@
 package com.dao.nbti.objection.application.controller;
 
 import com.dao.nbti.common.dto.ApiResponse;
+import com.dao.nbti.common.dto.Pagination;
 import com.dao.nbti.objection.application.dto.request.ObjectionCreateRequest;
 import com.dao.nbti.objection.application.dto.response.ObjectionCreateResponse;
 import com.dao.nbti.objection.application.dto.response.ObjectionDetailResponse;
@@ -12,11 +13,17 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/mypage/objections")
@@ -28,15 +35,26 @@ public class ObjectionController {
 
     @Operation(summary = "이의 제기 목록 조회", description = "로그인한 사용자의 이의 제기 내역을 상태별로 조회합니다.")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ObjectionSummaryResponse>>> getObjections(
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getObjections(
             @Parameter(description = "이의 제기 상태 필터", example = "PENDING")
             @RequestParam(required = false) Status status,
 
             @Parameter(hidden = true, description = "JWT 인증된 사용자 ID")
-            @AuthenticationPrincipal(expression = "userId") int userId
+            @AuthenticationPrincipal(expression = "userId") int userId,
+
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        List<ObjectionSummaryResponse> list = objectionService.getObjectionsByUser(userId, status);
-        return ResponseEntity.ok(ApiResponse.success(list));
+        Page<ObjectionSummaryResponse> page = objectionService.getObjectionsByUser(userId, status, pageable);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("content", page.getContent());
+        response.put("pagination", Pagination.builder()
+                .currentPage(page.getNumber() + 1)
+                .totalPage(page.getTotalPages())
+                .totalItems(page.getTotalElements())
+                .build());
+
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @Operation(summary = "이의 제기 상세 조회", description = "선택한 이의 제기 항목의 상세 정보를 조회합니다.")
@@ -54,26 +72,14 @@ public class ObjectionController {
 
     @PostMapping
     @Operation(summary = "이의 제기 등록", description = "문제에 대한 이의 제기를 등록합니다. 사유는 필수이며, 동일 문제에 대해 중복 등록할 수 없습니다.")
-    public ResponseEntity<ApiResponse<Void>> createObjection(
+    public ResponseEntity<ApiResponse<ObjectionCreateResponse>>  createObjectionTest(
             @RequestBody @Valid ObjectionCreateRequest request,
 
             @Parameter(hidden = true, description = "JWT 인증된 사용자 ID")
             @AuthenticationPrincipal(expression = "userId") int userId
     ) {
-        objectionService.createObjection(request, userId);
-        return ResponseEntity.ok(ApiResponse.success(null));
-    }
-
-    @PostMapping("/test") // 실제 운영 POST와 구분되도록 경로 뒤에 /test 추가
-    @Operation(summary = "이의 제기 등록 (테스트용)", description = "문제에 대한 이의 제기를 등록합니다. JWT 인증 없이 userId를 쿼리로 받습니다.")
-    public ResponseEntity<ApiResponse<ObjectionCreateResponse>>  createObjectionTest(
-            @RequestBody @Valid ObjectionCreateRequest request,
-
-            @RequestParam(name = "userId") int userId
-    ) {
         ObjectionCreateResponse response = objectionService.createObjection(request, userId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
-
 
 }
