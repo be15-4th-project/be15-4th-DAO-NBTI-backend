@@ -1,12 +1,10 @@
 package com.dao.nbti.user.domain.aggregate;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Getter
 @NoArgsConstructor
@@ -35,6 +33,10 @@ public class User {
     public void delete() {
         this.deletedAt = LocalDateTime.now();
         this.isDeleted = IsDeleted.Y;
+    }
+
+    public void addPoint() {
+        this.point += 1;
     }
 
 }
