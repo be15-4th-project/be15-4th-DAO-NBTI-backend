@@ -23,7 +23,7 @@ public interface TestResultRepository extends JpaRepository<TestResult, Integer>
     @Query("""
         SELECT t FROM TestResult t
         WHERE t.userId = :userId
-        AND t.isSaved = 'Y'
+        AND t.isSaved = com.dao.nbti.test.domain.aggregate.IsSaved.Y
         AND (:year IS NULL OR FUNCTION('YEAR', t.createdAt) = :year)
         AND (:month IS NULL OR FUNCTION('MONTH', t.createdAt) = :month)
     """)
@@ -33,4 +33,5 @@ public interface TestResultRepository extends JpaRepository<TestResult, Integer>
             @Param("month") Integer month,
             Pageable pageable
     );
+
 }
