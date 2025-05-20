@@ -1,12 +1,14 @@
 package com.dao.nbti.objection.application.controller;
 
 import com.dao.nbti.common.dto.ApiResponse;
+import com.dao.nbti.common.exception.ErrorCode;
 import com.dao.nbti.objection.application.dto.request.AdminObjectionSearchRequest;
 import com.dao.nbti.objection.application.dto.request.ObjectionUpdateRequest;
 import com.dao.nbti.objection.application.dto.response.AdminObjectionDetailResponse;
 import com.dao.nbti.objection.application.dto.response.AdminObjectionListResponse;
 import com.dao.nbti.objection.application.dto.response.ObjectionUpdateResponse;
 import com.dao.nbti.objection.application.service.AdminObjectionService;
+import com.dao.nbti.objection.exception.ObjectionException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -47,5 +49,13 @@ public class AdminObjectionController {
     ) {
         ObjectionUpdateResponse objection = adminObjectionService.updateObjection(objectionId, objectionUpdateRequest);
         return ResponseEntity.ok(ApiResponse.success(objection));
+    }
+
+    @ExceptionHandler(ObjectionException.class)
+    public ResponseEntity<ApiResponse<Void>> handleObjectionException(ObjectionException e) {
+        ErrorCode errorCode = e.getErrorCode();
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(ApiResponse.failure(errorCode.getCode(), errorCode.getMessage()));
     }
 }
