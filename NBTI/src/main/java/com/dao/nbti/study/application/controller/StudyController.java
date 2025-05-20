@@ -4,6 +4,7 @@ import com.dao.nbti.common.dto.ApiResponse;
 import com.dao.nbti.common.exception.ErrorCode;
 import com.dao.nbti.study.application.dto.request.SubmitStudyRequestDto;
 import com.dao.nbti.study.application.dto.response.ProblemResponseDto;
+import com.dao.nbti.study.application.dto.response.StudyCategoryListResponseDto;
 import com.dao.nbti.study.application.dto.response.StudyResultDetailResponseDto;
 import com.dao.nbti.study.application.dto.response.SubmitStudyResponseDto;
 import com.dao.nbti.study.application.service.StudyService;
@@ -27,7 +28,14 @@ public class StudyController {
 
     private final StudyService studyService;
 
-    @GetMapping
+    @GetMapping("/category")
+    @Operation(summary = "학습 분야 목록 조회", description = "학습 시 선택 가능한 상위 분야 6개의 목록 및 그에 대한 설명을 제공합니다.")
+    public ResponseEntity<ApiResponse<StudyCategoryListResponseDto>> getStudyCategoryList() {
+        StudyCategoryListResponseDto studyCategoryList = studyService.getStudyCategoryList();
+        return ResponseEntity.ok(ApiResponse.success(studyCategoryList));
+    }
+
+    @GetMapping("/problem")
     @Operation(summary = "학습 문제 3개 제공", description = "선택한 분야와 난이도에 따라 3문제를 제공합니다. level=0이면 무작위 난이도입니다.")
     public ResponseEntity<ApiResponse<List<ProblemResponseDto>>> getStudyProblems(
             @RequestParam Integer categoryId,

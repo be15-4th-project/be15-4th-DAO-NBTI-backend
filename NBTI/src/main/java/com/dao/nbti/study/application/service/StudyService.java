@@ -9,6 +9,7 @@ import com.dao.nbti.problem.domain.repository.CategoryRepository;
 import com.dao.nbti.problem.domain.repository.ProblemRepository;
 import com.dao.nbti.study.application.dto.request.SubmitStudyRequestDto;
 import com.dao.nbti.study.application.dto.response.ProblemResponseDto;
+import com.dao.nbti.study.application.dto.response.StudyCategoryListResponseDto;
 import com.dao.nbti.study.application.dto.response.StudyResultDetailResponseDto;
 import com.dao.nbti.study.application.dto.response.SubmitStudyResponseDto;
 import com.dao.nbti.study.domain.aggregate.IsCorrect;
@@ -41,6 +42,13 @@ public class StudyService {
     private final AnswerTypeRepository answerTypeRepository;
     private final UserRepository userRepository;
     private final PointHistoryRepository pointHistoryRepository;
+
+    @Transactional(readOnly = true)
+    public StudyCategoryListResponseDto getStudyCategoryList() {
+        List<Category> categoryList = categoryRepository.findByParentCategoryIsNull();
+
+        return StudyCategoryListResponseDto.from(categoryList);
+    }
 
     @Transactional(readOnly = true)
     public List<ProblemResponseDto> getProblems(Integer parentCategoryId, int level) {
@@ -111,6 +119,7 @@ public class StudyService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public StudyResultDetailResponseDto getStudyResultDetail(int studyId, UserDetails userDetails) {
         Study study = studyRepository.findById(studyId)
                 .orElseThrow(() -> new StudyNotFoundException(ErrorCode.STUDY_NOT_FOUND));
