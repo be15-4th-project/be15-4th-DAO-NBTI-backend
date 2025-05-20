@@ -7,6 +7,7 @@ import com.dao.nbti.user.application.dto.UserCreateRequest;
 import com.dao.nbti.user.application.service.UserService;
 import com.dao.nbti.user.exception.UserException;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ public class UserController {
     private final UserService userService;
     @Operation(summary = "회원가입", description = "사용자는 사용자 정보를 입력하여 회원가입 할 수 있다.")
     @GetMapping("/signup")
-    public ResponseEntity<ApiResponse<Void>> signup(@RequestBody UserCreateRequest userCreateRequest){
+    public ResponseEntity<ApiResponse<Void>> signup(@RequestBody @Valid UserCreateRequest userCreateRequest){
         userService.createUser(userCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(null));
     }
