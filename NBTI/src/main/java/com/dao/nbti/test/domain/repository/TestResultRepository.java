@@ -23,7 +23,7 @@ public interface TestResultRepository extends JpaRepository<TestResult, Integer>
     @Query("""
         SELECT t FROM TestResult t
         WHERE t.userId = :userId
-        AND t.isSaved = 'Y'
+        AND t.isSaved = com.dao.nbti.test.domain.aggregate.IsSaved.Y
         AND (:year IS NULL OR FUNCTION('YEAR', t.createdAt) = :year)
         AND (:month IS NULL OR FUNCTION('MONTH', t.createdAt) = :month)
     """)
@@ -34,12 +34,4 @@ public interface TestResultRepository extends JpaRepository<TestResult, Integer>
             Pageable pageable
     );
 
-    @Query(value = """
-        SELECT *
-        FROM test_result
-        WHERE user_id = :userId
-        ORDER BY created_at DESC
-        LIMIT 1
-    """, nativeQuery = true)
-    Optional<TestResult> findLatestByUserId(@Param("userId") int userId);
 }

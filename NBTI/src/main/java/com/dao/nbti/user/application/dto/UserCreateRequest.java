@@ -21,7 +21,10 @@ import java.util.Date;
 public class UserCreateRequest {
     @NotBlank
     @Size(min = 6)
-    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "아이디는 영문 또는 숫자만 입력할 수 있습니다")
+    @Pattern(
+            regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]+$",
+            message = "아이디는 영문과 숫자를 각각 하나 이상 포함해야 하며, 다른 문자를 포함할 수 없습니다."
+    )
     private String accountId;
 
     @NotBlank
