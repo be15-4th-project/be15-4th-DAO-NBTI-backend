@@ -4,8 +4,8 @@ import com.dao.nbti.common.auth.application.dto.*;
 import com.dao.nbti.common.auth.application.service.AuthService;
 import com.dao.nbti.common.dto.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -70,7 +70,7 @@ public class AuthController {
 
     @Operation(summary = "비밀번호 재설정", description = "사용자의 이름과 아이디 정보가 일치할 시 비밀번호를 재설정한다.")
     @GetMapping("/reset-password")
-    public ResponseEntity<ApiResponse<Void>> resetPassword(@RequestBody PasswordResetRequest request, @AuthenticationPrincipal UserDetails userDetails){
+    public ResponseEntity<ApiResponse<Void>> resetPassword(@RequestBody @Valid PasswordResetRequest request, @AuthenticationPrincipal UserDetails userDetails){
         authService.resetPassword(request, userDetails.getUsername());
 
         return ResponseEntity.ok().body(ApiResponse.success(null));
