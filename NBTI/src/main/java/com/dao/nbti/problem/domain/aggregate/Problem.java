@@ -1,5 +1,6 @@
 package com.dao.nbti.problem.domain.aggregate;
 
+import com.dao.nbti.problem.application.dto.request.ProblemCommandRequest;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -36,5 +37,13 @@ public class Problem {
         this.correctAnswer = correctAnswer;
         this.isDeleted = isDeleted;
         this.level = level;
+    }
+
+    public void updateFromRequest(ProblemCommandRequest request) {
+        this.categoryId = request.getCategoryId();
+        this.answerTypeId = request.getAnswerTypeId();
+        this.contentImageUrl = request.getContentImageUrl();
+        this.correctAnswer = request.getCorrectAnswer();
+        this.level = request.getLevel();
     }
 }
