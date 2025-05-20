@@ -10,7 +10,6 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 public class StudyResultDetailResponseDto {
-
     private int studyId;
     private int totalCount;
     private int correctCount;
@@ -22,6 +21,7 @@ public class StudyResultDetailResponseDto {
     public static class StudyResultItem {
         private int studyResultId;
         private int problemId;
+        private String contentImageUrl;
         private boolean isCorrect;
         private int level;
         private String submittedAnswer;

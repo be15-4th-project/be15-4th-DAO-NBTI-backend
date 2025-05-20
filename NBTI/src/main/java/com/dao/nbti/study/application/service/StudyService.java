@@ -151,6 +151,7 @@ public class StudyService {
                     .level(problem.getLevel())
                     .submittedAnswer(result.getAnswer())
                     .parentCategoryName(parentCategory.getName())
+                    .contentImageUrl(problem.getContentImageUrl())
                     .build();
         }).toList();
 
