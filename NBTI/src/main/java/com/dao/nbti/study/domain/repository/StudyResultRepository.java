@@ -26,6 +26,12 @@ public interface StudyResultRepository extends JpaRepository<StudyResult, Intege
 
     List<StudyResult> findByStudyId(int studyId);
 
-    boolean existsByUserIdAndProblemId(int userId, int problemId);
+    @Query("""
+        SELECT CASE WHEN COUNT(sr) > 0 THEN true ELSE false END
+        FROM StudyResult sr
+        JOIN Study s ON sr.studyId = s.studyId
+        WHERE s.userId = :userId AND sr.problemId = :problemId
+    """)
+    boolean existsByUserIdAndProblemId(@Param("userId") int userId, @Param("problemId") int problemId);
     
 }
