@@ -2,7 +2,6 @@ package com.dao.nbti.study.application.dto.request;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,7 +25,7 @@ public class SubmitStudyRequestDto {
         @Min(value = 1, message = "problemId는 1 이상이어야 합니다.")
         private int problemId;
 
-        @NotBlank(message = "답안은 비어 있을 수 없습니다.")
+        @NotNull(message = "답안은 비어 있을 수 없습니다.")
         private String userAnswer;
     }
 }
