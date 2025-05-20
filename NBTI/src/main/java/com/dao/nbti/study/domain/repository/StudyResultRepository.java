@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface StudyResultRepository extends JpaRepository<StudyResult, Integer> {
-
+    
     int countByStudyId(int studyId);
 
     int countByStudyIdAndIsCorrect(int studyId, IsCorrect isCorrect);
@@ -26,4 +26,6 @@ public interface StudyResultRepository extends JpaRepository<StudyResult, Intege
 
     List<StudyResult> findByStudyId(int studyId);
 
+    boolean existsByUserIdAndProblemId(int userId, int problemId);
+    
 }
