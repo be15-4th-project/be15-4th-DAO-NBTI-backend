@@ -4,10 +4,10 @@ import com.dao.nbti.common.dto.ApiResponse;
 import com.dao.nbti.common.exception.ErrorCode;
 import com.dao.nbti.study.application.dto.request.SubmitStudyRequestDto;
 import com.dao.nbti.study.application.dto.response.ProblemResponseDto;
+import com.dao.nbti.study.application.dto.response.StudyResultDetailResponseDto;
 import com.dao.nbti.study.application.dto.response.SubmitStudyResponseDto;
 import com.dao.nbti.study.application.service.StudyService;
-import com.dao.nbti.study.exception.NoSuchAnswerTypeException;
-import com.dao.nbti.study.exception.NoSuchCategoryException;
+import com.dao.nbti.study.exception.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -49,6 +49,17 @@ public class StudyController {
     }
 
 
+    @GetMapping("/result/{studyId}")
+    @Operation(summary = "학습 결과 조회", description = "해당 학습 ID의 문제 채점 결과를 반환합니다.")
+    public ResponseEntity<ApiResponse<StudyResultDetailResponseDto>> getStudyResult(
+            @PathVariable int studyId,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        StudyResultDetailResponseDto response = studyService.getStudyResultDetail(studyId, userDetails);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+
     @ExceptionHandler(NoSuchCategoryException.class)
     public ResponseEntity<ApiResponse<Void>> handleNoSuchCategoryException(NoSuchCategoryException e) {
         ErrorCode errorCode = e.getErrorCode();
@@ -59,6 +70,38 @@ public class StudyController {
 
     @ExceptionHandler(NoSuchAnswerTypeException.class)
     public ResponseEntity<ApiResponse<Void>> handleNoSuchAnswerTypeException(NoSuchAnswerTypeException e) {
+        ErrorCode errorCode = e.getErrorCode();
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(ApiResponse.failure(errorCode.getCode(), errorCode.getMessage()));
+    }
+
+    @ExceptionHandler(ProblemNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleProblemNotFoundException(ProblemNotFoundException e) {
+        ErrorCode errorCode = e.getErrorCode();
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(ApiResponse.failure(errorCode.getCode(), errorCode.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidAccessException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInvalidAccessException(InvalidAccessException e) {
+        ErrorCode errorCode = e.getErrorCode();
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(ApiResponse.failure(errorCode.getCode(), errorCode.getMessage()));
+    }
+
+    @ExceptionHandler(StudyNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleStudyNotFoundException(StudyNotFoundException e) {
+        ErrorCode errorCode = e.getErrorCode();
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(ApiResponse.failure(errorCode.getCode(), errorCode.getMessage()));
+    }
+
+    @ExceptionHandler(StudyResultNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleStudyResultNotFoundException(StudyResultNotFoundException e) {
         ErrorCode errorCode = e.getErrorCode();
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
