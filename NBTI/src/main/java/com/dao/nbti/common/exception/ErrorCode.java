@@ -19,6 +19,9 @@ public enum ErrorCode {
     PROBLEM_NOT_FOUND("20003", "해당하는 문제가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
     PARENT_CATEGORY_NOT_FOUND("20004", "상위 분야를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     PROBLEM_DELETED("20005", "삭제된 문제입니다.", HttpStatus.GONE),
+    STUDY_RESULT_NOT_FOUND("20006", "학습 결과가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
+    STUDY_NOT_FOUND("20007", "학습이 존재하지 않습니다.", HttpStatus.NOT_FOUND),
+    STUDY_ACCESS_DENIED("20008", "학습을 조회할 권한이 없습니다.", HttpStatus.FORBIDDEN),
 
     // 검사 결과 오류 (30000 ~ 39999)
     TEST_RESULT_NOT_FOUND("30001", "검사 결과를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),

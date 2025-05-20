@@ -9,20 +9,21 @@ import com.dao.nbti.problem.domain.repository.CategoryRepository;
 import com.dao.nbti.problem.domain.repository.ProblemRepository;
 import com.dao.nbti.study.application.dto.request.SubmitStudyRequestDto;
 import com.dao.nbti.study.application.dto.response.ProblemResponseDto;
+import com.dao.nbti.study.application.dto.response.StudyResultDetailResponseDto;
 import com.dao.nbti.study.application.dto.response.SubmitStudyResponseDto;
 import com.dao.nbti.study.domain.aggregate.IsCorrect;
 import com.dao.nbti.study.domain.aggregate.Study;
 import com.dao.nbti.study.domain.aggregate.StudyResult;
 import com.dao.nbti.study.domain.repository.StudyRepository;
 import com.dao.nbti.study.domain.repository.StudyResultRepository;
-import com.dao.nbti.study.exception.NoSuchAnswerTypeException;
-import com.dao.nbti.study.exception.NoSuchCategoryException;
-import com.dao.nbti.study.exception.ProblemNotFoundException;
+import com.dao.nbti.study.exception.*;
+import com.dao.nbti.user.domain.aggregate.Authority;
 import com.dao.nbti.user.domain.aggregate.PointHistory;
 import com.dao.nbti.user.domain.aggregate.PointType;
 import com.dao.nbti.user.domain.repository.PointHistoryRepository;
 import com.dao.nbti.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -109,4 +110,61 @@ public class StudyService {
                 .studyId(study.getStudyId())
                 .build();
     }
+
+    public StudyResultDetailResponseDto getStudyResultDetail(int studyId, UserDetails userDetails) {
+        Study study = studyRepository.findById(studyId)
+                .orElseThrow(() -> new StudyNotFoundException(ErrorCode.STUDY_NOT_FOUND));
+
+        // 학습의 주인이 요청한 사람인지 확인
+        boolean isOwner = study.getUserId().equals(Integer.parseInt(userDetails.getUsername()));
+
+        // 혹은 요청한 사람이 ADMIN인지 확인
+        String authorityName = userDetails.getAuthorities().iterator().next().getAuthority();
+        Authority role = Authority.valueOf(authorityName); // 문자열 → enum 변환
+
+        boolean isAdmin = role == Authority.ADMIN;
+
+        // ADMIN도 아니고, 학습한 사람도 아니면 에러처리
+        if (!isOwner && !isAdmin) {
+            throw new InvalidAccessException(ErrorCode.STUDY_ACCESS_DENIED);
+        }
+
+        List<StudyResult> results = studyResultRepository.findByStudyId(studyId);
+        if (results.isEmpty()) {
+            throw new StudyResultNotFoundException(ErrorCode.STUDY_RESULT_NOT_FOUND);
+        }
+
+        List<StudyResultDetailResponseDto.StudyResultItem> resultItems = results.stream().map(result -> {
+            Problem problem = problemRepository.findById(result.getProblemId())
+                    .orElseThrow(() -> new ProblemNotFoundException(ErrorCode.PROBLEM_NOT_FOUND));
+
+            Category category = categoryRepository.findById(problem.getCategoryId())
+                    .orElseThrow(() -> new NoSuchCategoryException(ErrorCode.CATEGORY_NOT_FOUND));
+
+            Category parentCategory = categoryRepository.findById(category.getParentCategoryId())
+                    .orElseThrow(() -> new NoSuchCategoryException(ErrorCode.CATEGORY_NOT_FOUND));
+
+            return StudyResultDetailResponseDto.StudyResultItem.builder()
+                    .studyResultId(result.getStudyResultId())
+                    .problemId(problem.getProblemId())
+                    .isCorrect(result.getIsCorrect() == IsCorrect.Y)
+                    .level(problem.getLevel())
+                    .submittedAnswer(result.getAnswer())
+                    .parentCategoryName(parentCategory.getName())
+                    .contentImageUrl(problem.getContentImageUrl())
+                    .build();
+        }).toList();
+
+        int correctCount = (int) results.stream()
+                .filter(r -> r.getIsCorrect() == IsCorrect.Y)
+                .count();
+
+        return StudyResultDetailResponseDto.builder()
+                .studyId(studyId)
+                .totalCount(resultItems.size())
+                .correctCount(correctCount)
+                .results(resultItems)
+                .build();
+    }
+
 }
