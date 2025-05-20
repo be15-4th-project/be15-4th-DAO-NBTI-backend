@@ -33,4 +33,13 @@ public interface TestResultRepository extends JpaRepository<TestResult, Integer>
             @Param("month") Integer month,
             Pageable pageable
     );
+
+    @Query(value = """
+        SELECT *
+        FROM test_result
+        WHERE user_id = :userId
+        ORDER BY created_at DESC
+        LIMIT 1
+    """, nativeQuery = true)
+    Optional<TestResult> findLatestByUserId(@Param("userId") int userId);
 }

@@ -1,6 +1,8 @@
 package com.dao.nbti.test.application.service;
 
+import com.dao.nbti.common.exception.ErrorCode;
 import com.dao.nbti.test.application.dto.request.TestResultCreateRequest;
+import com.dao.nbti.test.exception.TestException;
 import com.openai.client.OpenAIClient;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
 import com.openai.models.ChatModel;
@@ -45,10 +47,13 @@ public class TestAiAnswerServiceImpl implements TestAiAnswerService{
 
 
         // 응답 결과 객체 : 채팅 기반 모델을 사용해 메시지 기반으로 응답 (AI 호출하기)
-        ChatCompletion completion = client.chat().completions().create(params);
-
-        // AI 에게 응답 받은 거 생성하기
-        return completion.choices().get(0).message().content().orElse("").trim();
+        try {
+            ChatCompletion completion = client.chat().completions().create(params);
+            return completion.choices().get(0).message().content().orElse("").trim();
+        } catch (Exception e) {
+            // ai 호출 시 발생하는 에러
+            throw new TestException(ErrorCode.AI_CALL_FAILED);
+        }
     }
 
     /* 프롬포트 만들기 */
