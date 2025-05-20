@@ -28,6 +28,7 @@ public enum ErrorCode {
     TEST_RESULT_NOT_FOUND("30001", "검사 결과를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     UNAUTHORIZED_TEST_RESULT_ACCESS("30002", "본인의 검사 결과만 조회할 수 있습니다.", HttpStatus.FORBIDDEN),
     AI_CALL_FAILED("30003", "ai 호출에 실패했습니다.", HttpStatus.BAD_GATEWAY),
+    NOT_ENOUGH_POINT("30004", "포인트가 부족합니다.", HttpStatus.FORBIDDEN),
 
     // 이의 제기 오류 (40000 ~ 49999)
     OBJECTION_NOT_FOUND("40001", "이의 제기 항목을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
