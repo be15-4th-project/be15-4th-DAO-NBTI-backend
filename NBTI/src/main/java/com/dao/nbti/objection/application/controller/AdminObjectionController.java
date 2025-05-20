@@ -2,19 +2,14 @@ package com.dao.nbti.objection.application.controller;
 
 import com.dao.nbti.common.dto.ApiResponse;
 import com.dao.nbti.objection.application.dto.request.AdminObjectionSearchRequest;
+import com.dao.nbti.objection.application.dto.response.AdminObjectionDetailResponse;
 import com.dao.nbti.objection.application.dto.response.AdminObjectionListResponse;
-import com.dao.nbti.objection.application.dto.response.ObjectionSummaryResponse;
 import com.dao.nbti.objection.application.service.AdminObjectionService;
-import com.dao.nbti.objection.domain.aggregate.Status;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/admin/objections")
@@ -31,5 +26,14 @@ public class AdminObjectionController {
             ) {
         AdminObjectionListResponse objections = adminObjectionService.getObjections(adminObjectionSearchRequest);
         return ResponseEntity.ok(ApiResponse.success(objections));
+    }
+
+    @Operation(summary = "이의 제기 상세 조회", description = "관리자가 이의 제기 상세 내용을 조회합니다.")
+    @GetMapping("/{objectionId}")
+    public ResponseEntity<ApiResponse<AdminObjectionDetailResponse>> getObjectionDetails(
+            @PathVariable int objectionId
+    ) {
+        AdminObjectionDetailResponse objection = adminObjectionService.getObjectionDetails(objectionId);
+        return ResponseEntity.ok(ApiResponse.success(objection));
     }
 }
