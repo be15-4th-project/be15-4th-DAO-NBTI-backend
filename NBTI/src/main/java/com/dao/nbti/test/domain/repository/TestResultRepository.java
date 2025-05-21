@@ -43,4 +43,5 @@ public interface TestResultRepository extends JpaRepository<TestResult, Integer>
     """, nativeQuery = true)
     Optional<TestResult> findLatestByUserId(@Param("userId") int userId);
 
+    Optional<TestResult> findByTestResultId(int testResultId);
 }
