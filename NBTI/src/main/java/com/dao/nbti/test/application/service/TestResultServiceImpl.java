@@ -3,18 +3,15 @@ package com.dao.nbti.test.application.service;
 import com.dao.nbti.common.exception.ErrorCode;
 import com.dao.nbti.problem.domain.aggregate.Category;
 import com.dao.nbti.problem.domain.repository.CategoryRepository;
-import com.dao.nbti.test.application.dto.request.AdminTestResultSearchCondition;
 import com.dao.nbti.test.application.dto.request.TestResultSearchCondition;
 import com.dao.nbti.test.application.dto.response.*;
 import com.dao.nbti.test.domain.aggregate.TestResult;
 import com.dao.nbti.test.domain.repository.TestRepositoryCustom;
 import com.dao.nbti.test.domain.repository.TestResultRepository;
 import com.dao.nbti.test.exception.TestException;
-import com.dao.nbti.user.application.dto.UserAdminViewResponse;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -51,20 +48,6 @@ public class TestResultServiceImpl implements TestResultService {
         return toDetailResponse(result);
     }
 
-    @Override
-    public AdminTestResultSummaryResponse getAdminTestResultList(AdminTestResultSearchCondition condition, Pageable pageable) {
-        List<AccountTestResultDto> results = testRepositoryCustom.getTest(condition,pageable);
-        List<AdminTestResultSummaryDTO> content = results.stream()
-                .map(dto -> {
-                    AdminTestResultSummaryDTO adminTestResultSummaryDTO= modelMapper.map(
-                            toSummaryResponse(dto.getTestResult()), AdminTestResultSummaryDTO.class
-                    );
-                    adminTestResultSummaryDTO.setAccountId(dto.getAccountId());
-                    return adminTestResultSummaryDTO;
-                }).toList();
-        long total = testRepositoryCustom.countTest(condition);
-        return new AdminTestResultSummaryResponse(new PageImpl<>(content, pageable, total));
-    }
 
     private TestResultSummaryResponse toSummaryResponse(TestResult result) {
         int[] scores = {
