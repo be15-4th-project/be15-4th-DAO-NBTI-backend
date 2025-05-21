@@ -7,6 +7,7 @@ import com.dao.nbti.test.application.dto.response.AdminTestResultSummaryResponse
 import com.dao.nbti.test.application.dto.response.TestResultDetailResponse;
 import com.dao.nbti.test.application.dto.request.TestResultSearchCondition;
 import com.dao.nbti.test.application.dto.response.TestResultSummaryResponse;
+import com.dao.nbti.test.application.service.AdminTestResultService;
 import com.dao.nbti.test.application.service.TestResultService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,6 +30,7 @@ import java.util.Map;
 public class TestResultController {
 
     private final TestResultService testResultService;
+    private final AdminTestResultService adminTestResultService;
 
     @Operation(summary = "검사 결과 목록 조회", description = "로그인한 사용자의 검사 결과 목록을 조회합니다. 연도/월별 필터링 및 페이지네이션이 가능합니다.")
     @GetMapping("/list")
@@ -92,7 +94,7 @@ public class TestResultController {
     ) {
         AdminTestResultSearchCondition condition = new AdminTestResultSearchCondition(year, month, accountId);
 
-        AdminTestResultSummaryResponse resultPage = testResultService.getAdminTestResultList(condition, pageable);
+        AdminTestResultSummaryResponse resultPage = adminTestResultService.getAdminTestResultList(condition, pageable);
 
         Map<String, Object> response = new HashMap<>();
         response.put("content", resultPage.getPage().getContent());
@@ -101,6 +103,17 @@ public class TestResultController {
                 .totalPage(resultPage.getPage().getTotalPages())
                 .totalItems(resultPage.getPage().getTotalElements())
                 .build());
+
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @Operation(summary = "관리자 검사 상세조회", description = "검사 결과 ID를 통해 상세 정보를 조회합니다.")
+    @GetMapping("/{testResultId}/admin")
+    public ResponseEntity<ApiResponse<TestResultDetailResponse>> getTestResultDetail(
+            @Parameter(description = "검사 결과 ID", example = "1")
+            @PathVariable int testResultId
+    ){
+        TestResultDetailResponse response = adminTestResultService.getTestResultDetail(testResultId);
 
         return ResponseEntity.ok(ApiResponse.success(response));
     }
