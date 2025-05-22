@@ -13,7 +13,7 @@ import java.util.List;
 public interface ObjectionService {
 
     // 목록 조회
-    Page<ObjectionSummaryResponse> getObjectionsByUser(int userId, Status status, Pageable pageable);
+    Page<ObjectionSummaryResponse> getObjectionsByUser(int userId, Status status, Integer parentCategoryId, Pageable pageable);
 
     // 상세 조회
     ObjectionDetailResponse getObjectionDetail(int objectionId, int userId);
