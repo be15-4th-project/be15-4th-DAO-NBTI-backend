@@ -1,9 +1,7 @@
 package com.dao.nbti.study.application.dto.request;
 
 import jakarta.validation.constraints.Min;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
