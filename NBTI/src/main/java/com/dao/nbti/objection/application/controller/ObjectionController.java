@@ -43,10 +43,13 @@ public class ObjectionController {
             @Parameter(hidden = true, description = "JWT 인증된 사용자 정보")
             @AuthenticationPrincipal UserDetails userDetails,
 
+            @Parameter(description = "상위 분야 ID", example = "1")
+            @RequestParam(required = false) Integer parentCategoryId,
+
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         int userId = Integer.parseInt(userDetails.getUsername());
-        Page<ObjectionSummaryResponse> page = objectionService.getObjectionsByUser(userId, status, pageable);
+        Page<ObjectionSummaryResponse> page = objectionService.getObjectionsByUser(userId, status, parentCategoryId, pageable);
 
         Map<String, Object> response = new HashMap<>();
         response.put("content", page.getContent());

@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 public class ObjectionSummaryResponse {
     private int objectionId;
     private int problemId;
+    private String parentCategoryName;
+    private String reason;
     private Status status;           // 상태: PENDING / ACCEPTED / REJECTED
     private LocalDateTime createdAt; // 제출 일시
 }
