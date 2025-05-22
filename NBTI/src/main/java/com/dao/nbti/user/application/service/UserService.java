@@ -80,4 +80,12 @@ public class UserService {
         return new UserAdminViewResponse(new PageImpl<>(content, pageable, total));
 
     }
+
+    @Transactional(readOnly = true)
+    public int getUserPoint(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND));
+
+        return user.getPoint();
+    }
 }
