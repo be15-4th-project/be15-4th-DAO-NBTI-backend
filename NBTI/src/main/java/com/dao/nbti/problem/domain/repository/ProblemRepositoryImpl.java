@@ -27,7 +27,7 @@ public class ProblemRepositoryImpl implements ProblemRepositoryCustom {
         LEFT JOIN Category pc ON c.parentCategoryId = pc.categoryId
         WHERE p.isDeleted = :isDeleted
         """;
-        String jpql = getDynamicQuery(initQuery, request);
+        String jpql = getDynamicQuery(initQuery, request, true);
 
         TypedQuery<ProblemSummaryDTO> query = em.createQuery(jpql, ProblemSummaryDTO.class);
 
@@ -41,6 +41,7 @@ public class ProblemRepositoryImpl implements ProblemRepositoryCustom {
         if (request.getLevel() != null) {
             query.setParameter("level", request.getLevel());
         }
+
 
         return query
                 .setFirstResult(request.getOffset())
@@ -57,7 +58,7 @@ public class ProblemRepositoryImpl implements ProblemRepositoryCustom {
         LEFT JOIN Category pc ON c.parentCategoryId = pc.categoryId
         WHERE p.isDeleted = :isDeleted
         """;
-        String jpql = getDynamicQuery(initQuery, request);
+        String jpql = getDynamicQuery(initQuery, request, false);
 
         TypedQuery<Long> query = em.createQuery(jpql, Long.class);
         query.setParameter("isDeleted", IsDeleted.N);
@@ -74,7 +75,7 @@ public class ProblemRepositoryImpl implements ProblemRepositoryCustom {
         return query.getSingleResult();
     }
 
-    private static String getDynamicQuery(String str, ProblemSearchRequest request) {
+    private static String getDynamicQuery(String str, ProblemSearchRequest request, boolean isOrdered) {
         StringBuilder jpql = new StringBuilder(str);
 
         if (request.getParentCategoryId() != null) {
@@ -86,6 +87,10 @@ public class ProblemRepositoryImpl implements ProblemRepositoryCustom {
         }
         if (request.getLevel() != null) {
             jpql.append("\nAND p.level = :level");
+        }
+
+        if (isOrdered) {
+            jpql.append("\nORDER BY p.problemId ASC");
         }
         return jpql.toString();
     }
