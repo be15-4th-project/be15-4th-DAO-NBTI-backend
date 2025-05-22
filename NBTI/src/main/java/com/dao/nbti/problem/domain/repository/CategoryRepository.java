@@ -16,4 +16,9 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     List<Category> findByParentCategoryIdIsNullOrderByCategoryIdAsc();
 
     List<Category> findByParentCategoryIdIsNotNullOrderByParentCategoryIdAscCategoryIdAsc();
+
+    // 하위 카테고리의 상위 카테고리 조회
+    @Query("SELECT c.parentCategoryId FROM Category c WHERE c.categoryId = :categoryId")
+    int findParentCategoryIdByCategoryId(int categoryId);
+
 }

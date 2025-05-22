@@ -31,10 +31,10 @@ public class TestAiAnswerServiceImpl implements TestAiAnswerService{
 
     /* 응답 생성 */
     @Override
-    public String createAiAnswer(TestResultCreateRequest request) {
+    public String createAiAnswer(TestResultCreateRequest request, Integer userId) {
 
         // 프롬포트 생성해서 넘겨 주기
-        String prompt = createPrompt(request);
+        String prompt = createPrompt(request, userId);
 
         log.info(prompt);
 
@@ -57,11 +57,13 @@ public class TestAiAnswerServiceImpl implements TestAiAnswerService{
     }
 
     /* 프롬포트 만들기 */
-    private String createPrompt(TestResultCreateRequest request) {
+    private String createPrompt(TestResultCreateRequest request, Integer userId) {
+        String scoreRange = (userId != null) ? "0점 ~ 6점까지 입니다." : "0점 ~ 2점까지 입니다.";
+
         return String.format("""
                 다음은 사용자의 지능 검사 결과입니다.
-                각각의 검사별로 점수는 0점 ~ 6점까지 입니다.
-
+                각각의 검사별로 점수는 %s
+                        
                 - 언어 이해: %d점
                 - 시사 상식: %d점
                 - 지각 추론: %d점
@@ -69,10 +71,13 @@ public class TestAiAnswerServiceImpl implements TestAiAnswerService{
                 - 처리 속도: %d점
                 - 공간 지각력: %d점
 
-                위 정보를 바탕으로 사용자의 전반적인 인지 능력, 성향, 특징 등을 5줄 이내로 총평해주세요.
+                위 정보를 바탕으로 사용자의 전반적인 인지 능력, 성향, 특징 등을 총평해주세요.
+                만약 점수의 범위가 0점 ~ 2점이라면 3줄 로 총평을 작성해 주고, 
+                0점 ~ 6점이라면 5줄로 총평해주세요.
                 말투는 전문가가 정중하게 해설하는 듯한 느낌으로, 너무 가볍지 않게 써주세요.
                 그리고 정보를 제공할 때, '당신은'이라는 말을 이용해서 설명해주세요.
                 """,
+                scoreRange,
                 request.getLangComp(),
                 request.getGeneralKnowledge(),
                 request.getPercReason(),
