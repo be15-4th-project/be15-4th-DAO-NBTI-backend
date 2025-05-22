@@ -19,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -39,11 +40,12 @@ public class ObjectionController {
             @Parameter(description = "이의 제기 상태 필터", example = "PENDING")
             @RequestParam(required = false) Status status,
 
-            @Parameter(hidden = true, description = "JWT 인증된 사용자 ID")
-            @AuthenticationPrincipal(expression = "userId") int userId,
+            @Parameter(hidden = true, description = "JWT 인증된 사용자 정보")
+            @AuthenticationPrincipal UserDetails userDetails,
 
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
+        int userId = Integer.parseInt(userDetails.getUsername());
         Page<ObjectionSummaryResponse> page = objectionService.getObjectionsByUser(userId, status, pageable);
 
         Map<String, Object> response = new HashMap<>();
@@ -63,9 +65,10 @@ public class ObjectionController {
             @Parameter(description = "조회할 이의 제기 ID", example = "7")
             @PathVariable int objectionId,
 
-            @Parameter(hidden = true)
-            @AuthenticationPrincipal(expression = "userId") int userId
+            @Parameter(hidden = true, description = "JWT 인증된 사용자 정보")
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
+        int userId = Integer.parseInt(userDetails.getUsername());
         ObjectionDetailResponse detail = objectionService.getObjectionDetail(objectionId, userId);
         return ResponseEntity.ok(ApiResponse.success(detail));
     }
@@ -75,9 +78,10 @@ public class ObjectionController {
     public ResponseEntity<ApiResponse<ObjectionCreateResponse>>  createObjectionTest(
             @RequestBody @Valid ObjectionCreateRequest request,
 
-            @Parameter(hidden = true, description = "JWT 인증된 사용자 ID")
-            @AuthenticationPrincipal(expression = "userId") int userId
+            @Parameter(hidden = true, description = "JWT 인증된 사용자 정보")
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
+        int userId = Integer.parseInt(userDetails.getUsername());
         ObjectionCreateResponse response = objectionService.createObjection(request, userId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }

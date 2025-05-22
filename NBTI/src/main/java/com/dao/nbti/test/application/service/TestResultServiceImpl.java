@@ -69,7 +69,7 @@ public class TestResultServiceImpl implements TestResultService {
         }
 
         int totalScore = (int) Math.round(
-                (scores[0] + scores[1] + scores[2] + scores[3] + scores[4] + scores[5]) / 6.0
+                (scores[0] + scores[1] + scores[2] + scores[3] + scores[4] + scores[5])
         );
 
         return TestResultSummaryResponse.builder()

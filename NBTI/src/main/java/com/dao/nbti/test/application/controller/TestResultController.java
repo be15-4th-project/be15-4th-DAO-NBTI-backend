@@ -2,6 +2,7 @@ package com.dao.nbti.test.application.controller;
 
 import com.dao.nbti.common.dto.ApiResponse;
 import com.dao.nbti.common.dto.Pagination;
+import com.dao.nbti.common.exception.ErrorCode;
 import com.dao.nbti.test.application.dto.request.AdminTestResultSearchCondition;
 import com.dao.nbti.test.application.dto.request.TestSubmitRequest;
 import com.dao.nbti.test.application.dto.response.AdminTestResultSummaryResponse;
@@ -11,6 +12,7 @@ import com.dao.nbti.test.application.dto.response.TestResultSummaryResponse;
 import com.dao.nbti.test.application.service.AdminTestResultService;
 import com.dao.nbti.test.application.service.TestResultService;
 import com.dao.nbti.test.application.service.TestService;
+import com.dao.nbti.user.exception.UserException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,8 +42,8 @@ public class TestResultController {
     @Operation(summary = "검사 결과 목록 조회", description = "로그인한 사용자의 검사 결과 목록을 조회합니다. 연도/월별 필터링 및 페이지네이션이 가능합니다.")
     @GetMapping("/list")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getTestResults(
-            @Parameter(hidden = true, description = "JWT 인증된 사용자 ID")
-            @AuthenticationPrincipal(expression = "userId") int userId,
+            @Parameter(hidden = true, description = "JWT 인증된 사용자 정보")
+            @AuthenticationPrincipal UserDetails userDetails,
 
             @Parameter(description = "조회할 연도", example = "2025")
             @RequestParam(required = false) Integer year,
@@ -55,6 +57,11 @@ public class TestResultController {
             @Parameter(description = "페이지 및 정렬 정보")
             @PageableDefault(size = 10, sort = "createdAt") Pageable pageable
     ) {
+        if (userDetails == null) {
+            throw new UserException(ErrorCode.LOGIN_ID_ALREADY_EXISTS);
+        }
+
+        int userId = Integer.parseInt(userDetails.getUsername());
         TestResultSearchCondition condition = new TestResultSearchCondition(year, month, sort, userId);
         Page<TestResultSummaryResponse> resultPage = testResultService.getTestResultList(condition, pageable);
 
@@ -72,12 +79,13 @@ public class TestResultController {
     @Operation(summary = "검사 결과 상세 조회", description = "검사 결과 ID를 통해 상세 정보를 조회합니다.")
     @GetMapping("/{testResultId}")
     public ResponseEntity<ApiResponse<TestResultDetailResponse>> getTestResultDetail(
-            @Parameter(hidden = true, description = "JWT 인증된 사용자 ID")
-            @AuthenticationPrincipal(expression = "userId") int userId,
+            @Parameter(hidden = true, description = "JWT 인증된 사용자 정보")
+            @AuthenticationPrincipal UserDetails userDetails,
 
             @Parameter(description = "검사 결과 ID", example = "1")
             @PathVariable int testResultId
     ) {
+        int userId = Integer.parseInt(userDetails.getUsername());
         TestResultDetailResponse detail = testResultService.getTestResultDetail(testResultId, userId);
         return ResponseEntity.ok(ApiResponse.success(detail));
     }
