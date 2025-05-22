@@ -20,7 +20,7 @@ public class ProblemRepositoryImpl implements ProblemRepositoryCustom {
     public List<ProblemSummaryDTO> getProblemsBy(ProblemSearchRequest request) {
         String initQuery = """
         SELECT new com.dao.nbti.problem.application.dto.response.ProblemSummaryDTO(
-            p.problemId, p.categoryId, p.level, pc.name, c.name
+            p.problemId, p.categoryId, p.level, pc.name, p.answerTypeId, c.name
         )
         FROM Problem p
         JOIN Category c ON p.categoryId = c.categoryId

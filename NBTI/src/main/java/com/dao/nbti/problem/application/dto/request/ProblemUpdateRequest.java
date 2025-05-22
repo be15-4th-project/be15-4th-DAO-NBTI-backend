@@ -10,8 +10,6 @@ public class ProblemUpdateRequest implements ProblemCommandRequest {
     private int categoryId;
     private int answerTypeId;
     @NotBlank
-    private String contentImageUrl;
-    @NotBlank
     private String correctAnswer;
     @Min(1)
     @Max(3)

@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -31,8 +32,8 @@ public class StudyResultController {
     @Operation(summary = "학습 내역 목록 조회", description = "로그인한 사용자의 학습 이력을 조회합니다. 연도, 월, 상위 분야 필터 및 페이지네이션을 지원합니다.")
     @GetMapping
     public ResponseEntity<ApiResponse<Map<String, Object>>> getStudyList(
-            @Parameter(hidden = true, description = "JWT 인증된 사용자 ID")
-            @AuthenticationPrincipal(expression = "userId") int userId,
+            @Parameter(hidden = true, description = "JWT 인증된 사용자 정보")
+            @AuthenticationPrincipal UserDetails userDetails,
 
             @Parameter(description = "조회할 연도", example = "2025")
             @RequestParam(required = false) Integer year,
@@ -46,6 +47,7 @@ public class StudyResultController {
             @Parameter(description = "페이지 및 정렬 정보")
             @PageableDefault(size = 10, sort = "createdAt") Pageable pageable
     ) {
+        int userId = Integer.parseInt(userDetails.getUsername());
         StudySearchCondition condition = new StudySearchCondition(year, month, parentCategoryId, userId);
         Page<StudySummaryResponse> resultPage = studyResultService.getStudyList(condition, pageable);
 
@@ -63,12 +65,13 @@ public class StudyResultController {
     @Operation(summary = "학습 상세 조회", description = "선택한 학습 내역의 상세 정보를 조회합니다.")
     @GetMapping("/{studyId}")
     public ResponseEntity<ApiResponse<StudyDetailResponse>> getStudyDetail(
-            @Parameter(hidden = true, description = "JWT 인증된 사용자 ID")
-            @AuthenticationPrincipal(expression = "userId") int userId,
+            @Parameter(hidden = true, description = "JWT 인증된 사용자 정보")
+            @AuthenticationPrincipal UserDetails userDetails,
 
             @Parameter(description = "학습 ID", example = "1")
             @PathVariable int studyId
     ) {
+        int userId = Integer.parseInt(userDetails.getUsername());
         StudyDetailResponse detail = studyResultService.getStudyDetail(studyId, userId);
         return ResponseEntity.ok(ApiResponse.success(detail));
     }

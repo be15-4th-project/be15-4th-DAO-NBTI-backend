@@ -46,6 +46,20 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
+    @GetMapping("/points")
+    @Operation(
+            summary = "회원의 포인트 조회", description = "현재 회원이 보유하고 있는 포인트를 조회합니다."
+    )
+    public ResponseEntity<ApiResponse<Integer>> getPoints(
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        Integer userId = Integer.parseInt(userDetails.getUsername());
+
+        int points =  userService.getUserPoint(userId);
+
+        return ResponseEntity.ok(ApiResponse.success(points));
+    }
+
     @Operation(summary = "회원 정보 조회", description = "회원은 자신의 아이디, 이름, 생년월일, 성별, 포인트 등의 정보를 조회 및 필터링할 수 있다.")
     @GetMapping("/info")
     public ResponseEntity<ApiResponse<UserInfoResponse>> getUserInfo(@AuthenticationPrincipal UserDetails userDetails){

@@ -12,3 +12,8 @@ public class StudySummaryListResponseDto {
     private List<StudySummaryDto> studies;
     private Pagination pagination;
 }
+
+
+
+
+
