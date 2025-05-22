@@ -1,7 +1,6 @@
 package com.dao.nbti.study.application.dto.request;
 
 import jakarta.validation.constraints.Min;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -9,7 +8,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
 
 @Getter
-@Builder
 @ToString
 public class StudySearchRequestDto {
     @Min(value = 1, message = "사용자 번호는 1 이상이어야 합니다.")
@@ -31,18 +29,10 @@ public class StudySearchRequestDto {
     private Integer size = 10;
 
     public int getOffset() {
-        return (getPage() - 1) * getSize();
+        return (page - 1) * size;
     }
 
     public int getLimit() {
-        return getSize();
-    }
-
-    public int getPage() {
-        return page != null ? page : 1;
-    }
-
-    public int getSize() {
-        return size != null ? size : 10;
+        return size;
     }
 }

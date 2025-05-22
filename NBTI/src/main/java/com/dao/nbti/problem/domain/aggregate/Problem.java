@@ -42,8 +42,11 @@ public class Problem {
     public void updateFromRequest(ProblemCommandRequest request) {
         this.categoryId = request.getCategoryId();
         this.answerTypeId = request.getAnswerTypeId();
-        this.contentImageUrl = request.getContentImageUrl();
         this.correctAnswer = request.getCorrectAnswer();
         this.level = request.getLevel();
+    }
+
+    public void updateContentImageUrl(String newUrl) {
+        this.contentImageUrl = newUrl;
     }
 }

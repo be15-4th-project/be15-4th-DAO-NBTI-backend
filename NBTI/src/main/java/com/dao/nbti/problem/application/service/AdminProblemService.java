@@ -16,7 +16,9 @@ import com.dao.nbti.problem.exception.ProblemException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -26,6 +28,7 @@ public class AdminProblemService {
     private final ProblemRepository problemRepository;
     private final CategoryRepository categoryRepository;
     private final AnswerTypeRepository answerTypeRepository;
+    private final S3Service s3Service;
 
     @Transactional(readOnly = true)
     public ProblemListResponse getProblems(ProblemSearchRequest problemSearchRequest) {
@@ -65,45 +68,59 @@ public class AdminProblemService {
 
     // 'https://a3.nbti.ai/images/problem_lang_07_01.png'
     @Transactional
-    public ProblemDetailsResponse createProblem(ProblemCreateRequest problemCreateRequest) {
-        int categoryId = problemCreateRequest.getCategoryId();
-        int answerTypeId = problemCreateRequest.getAnswerTypeId();
-        String contentImageUrl = problemCreateRequest.getContentImageUrl();
-        String correctAnswer = problemCreateRequest.getCorrectAnswer();
-        int level = problemCreateRequest.getLevel();
+    public ProblemDetailsResponse createProblem(ProblemCreateRequest request, MultipartFile imageFile) {
+        int categoryId = request.getCategoryId();
 
-        validateProblemCommandRequest(problemCreateRequest);
+        // 1. 이미지 업로드 (필수로 받는다고 가정)
+        String contentImageUrl;
+        try {
+            contentImageUrl = s3Service.uploadProblemImage(imageFile, categoryId);
+        } catch (IOException e) {
+            throw new RuntimeException("S3 이미지 업로드 실패", e);
+        }
 
         Problem problem = Problem.builder()
                 .categoryId(categoryId)
-                .answerTypeId(answerTypeId)
+                .answerTypeId(request.getAnswerTypeId())
                 .contentImageUrl(contentImageUrl)
-                .correctAnswer(correctAnswer)
+                .correctAnswer(request.getCorrectAnswer())
+                .level(request.getLevel())
                 .isDeleted(IsDeleted.N)
-                .level(level)
                 .build();
 
         Problem saved = problemRepository.save(problem);
 
-        Category childCategory = categoryRepository.findById(categoryId)
+        Category child = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ProblemException(ErrorCode.CATEGORY_NOT_FOUND));
-        Category parentCategory = categoryRepository.findById(childCategory.getParentCategoryId())
+        Category parent = categoryRepository.findById(child.getParentCategoryId())
                 .orElseThrow(() -> new ProblemException(ErrorCode.CATEGORY_NOT_FOUND));
-        String answerTypeDescription = AnswerTypeEnum.of(problemCreateRequest.getAnswerTypeId());
-
-        ProblemDTO problemDTO = ProblemDTO.from(saved, childCategory, parentCategory, answerTypeDescription);
+        String answerTypeDescription = AnswerTypeEnum.of(request.getAnswerTypeId());
 
         return ProblemDetailsResponse.builder()
-                .problem(problemDTO)
+                .problem(ProblemDTO.from(saved, child, parent, answerTypeDescription))
                 .build();
     }
 
+
     @Transactional
-    public ProblemDetailsResponse updateProblem(ProblemUpdateRequest problemUpdateRequest, int problemId) {
+    public ProblemDetailsResponse updateProblem(ProblemUpdateRequest request, int problemId, MultipartFile imageFile) {
         Problem problem = problemRepository.findByProblemIdAndIsDeleted(problemId, IsDeleted.N)
                 .orElseThrow(() -> new ProblemException(ErrorCode.PROBLEM_NOT_FOUND));
-        validateProblemCommandRequest(problemUpdateRequest);
-        problem.updateFromRequest(problemUpdateRequest);
+
+        validateProblemCommandRequest(request);
+
+        // 이미지 새로 들어오면 S3에 업로드하고 교체
+        if (imageFile != null && !imageFile.isEmpty()) {
+            try {
+                String newImageUrl = s3Service.uploadProblemImage(imageFile, request.getCategoryId());
+                problem.updateContentImageUrl(newImageUrl);
+            } catch (IOException e) {
+                throw new RuntimeException("문제 이미지 업로드 실패", e);
+            }
+        }
+
+        // 나머지 값 수정
+        problem.updateFromRequest(request);
 
         Category childCategory = categoryRepository.findById(problem.getCategoryId())
                 .orElseThrow(() -> new ProblemException(ErrorCode.CATEGORY_NOT_FOUND));
@@ -111,9 +128,11 @@ public class AdminProblemService {
                 .orElseThrow(() -> new ProblemException(ErrorCode.CATEGORY_NOT_FOUND));
         String answerTypeDescription = AnswerTypeEnum.of(problem.getAnswerTypeId());
 
-        ProblemDTO problemDTO = ProblemDTO.from(problem, childCategory, parentCategory, answerTypeDescription);
-        return ProblemDetailsResponse.builder().problem(problemDTO).build();
+        return ProblemDetailsResponse.builder()
+                .problem(ProblemDTO.from(problem, childCategory, parentCategory, answerTypeDescription))
+                .build();
     }
+
 
     private void validateProblemCommandRequest(ProblemCommandRequest problemCommandRequest) {
         int categoryId = problemCommandRequest.getCategoryId();

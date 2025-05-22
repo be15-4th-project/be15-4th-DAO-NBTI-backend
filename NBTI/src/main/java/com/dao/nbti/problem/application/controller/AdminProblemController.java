@@ -11,11 +11,15 @@ import com.dao.nbti.problem.application.dto.response.ProblemListResponse;
 import com.dao.nbti.problem.application.service.AdminProblemService;
 import com.dao.nbti.problem.exception.ProblemException;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/admin/problems")
@@ -39,19 +43,31 @@ public class AdminProblemController {
         return ResponseEntity.ok(ApiResponse.success(adminProblemService.getProblemDetails(problemId)));
     }
 
-    @PostMapping
-    @Operation(summary = "문제 등록", description = "관리자가 서비스에 문제를 등록합니다.")
-    public ResponseEntity<ApiResponse<ProblemDetailsResponse>> createProblem(@Valid @RequestBody ProblemCreateRequest problemCreateRequest) {
-
-        return ResponseEntity.ok(ApiResponse.success(adminProblemService.createProblem(problemCreateRequest)));
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "문제 등록", description = "관리자가 서비스에 문제를 등록합니다. 이미지 파일은 필수입니다.")
+    public ResponseEntity<ApiResponse<ProblemDetailsResponse>> createProblem(
+            @RequestPart @Validated ProblemCreateRequest problemCreateRequest,
+            @Parameter(
+                    description = "multipart/form-data 형식의 이미지 파일. key는 imageFile 입니다.",
+                    content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE)
+            )
+            @RequestPart("imageFile") MultipartFile imageFile
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(adminProblemService.createProblem(problemCreateRequest, imageFile)));
     }
 
-    @PutMapping("/{problemId}")
-    @Operation(summary = "문제 수정", description = "관리자가 서비스에 등록된 문제를 수정합니다.")
-    public ResponseEntity<ApiResponse<ProblemDetailsResponse>> updateProblem(@Valid @RequestBody ProblemUpdateRequest problemUpdateRequest, @PathVariable int problemId) {
-
-        return ResponseEntity.ok(ApiResponse.success(adminProblemService.updateProblem(problemUpdateRequest, problemId)));
+    @PutMapping(value = "/{problemId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "문제 수정", description = "관리자가 서비스에 등록된 문제를 수정합니다. 이미지를 새로 첨부하면 교체되고, 아니면 기존 이미지 유지됩니다." )
+    public ResponseEntity<ApiResponse<ProblemDetailsResponse>> updateProblem(
+            @RequestPart @Validated ProblemUpdateRequest problemUpdateRequest,
+            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile,
+            @PathVariable int problemId
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(
+                adminProblemService.updateProblem(problemUpdateRequest, problemId, imageFile)
+        ));
     }
+
 
     @DeleteMapping("/{problemId}")
     @Operation(summary = "문제 삭제", description = "관리자가 서비스에 등록된 문제를 삭제합니다.")
