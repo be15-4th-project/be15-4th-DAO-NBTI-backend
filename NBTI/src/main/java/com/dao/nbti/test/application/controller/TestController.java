@@ -1,18 +1,18 @@
 package com.dao.nbti.test.application.controller;
 
 import com.dao.nbti.common.dto.ApiResponse;
-import com.dao.nbti.test.application.dto.request.TestSubmitRequest;
 import com.dao.nbti.test.application.dto.response.TestProblemListResponse;
 import com.dao.nbti.test.application.service.TestService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "검사", description = "검사 문제 조회, 결과 저장, 결과 조회")
