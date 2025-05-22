@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
     @Operation(summary = "회원가입", description = "사용자는 사용자 정보를 입력하여 회원가입 할 수 있다.")
-    @GetMapping("/signup")
+    @PostMapping("/signup")
     public ResponseEntity<ApiResponse<Void>> signup(@RequestBody @Valid UserCreateRequest userCreateRequest){
         userService.createUser(userCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(null));
@@ -44,6 +44,20 @@ public class UserController {
         IdDuplicateResponse response = userService.checkAccountId(accountId);
 
         return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @GetMapping("/points")
+    @Operation(
+            summary = "회원의 포인트 조회", description = "현재 회원이 보유하고 있는 포인트를 조회합니다."
+    )
+    public ResponseEntity<ApiResponse<Integer>> getPoints(
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        Integer userId = Integer.parseInt(userDetails.getUsername());
+
+        int points =  userService.getUserPoint(userId);
+
+        return ResponseEntity.ok(ApiResponse.success(points));
     }
 
     @Operation(summary = "회원 정보 조회", description = "회원은 자신의 아이디, 이름, 생년월일, 성별, 포인트 등의 정보를 조회 및 필터링할 수 있다.")
