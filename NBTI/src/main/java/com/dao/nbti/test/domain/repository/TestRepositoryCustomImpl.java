@@ -77,11 +77,11 @@ public class TestRepositoryCustomImpl implements TestRepositoryCustom {
         StringBuilder jpql = new StringBuilder(str);
 
         if (condition.getYear() != null) {
-            jpql.append("\nAND FUNCTION('YEAR', tr.createdAt) = :year)");
+            jpql.append("\nAND FUNCTION('YEAR', tr.createdAt) = :year");
         }
 
         if (condition.getMonth() != null) {
-            jpql.append("\nAND FUNCTION('MONTH', tr.createdAt) = :month)");
+            jpql.append("\nAND FUNCTION('MONTH', tr.createdAt) = :month");
         }
         if(condition.getAccountId()!=null){
             jpql.append("\nAND u.accountId = :accountId");
