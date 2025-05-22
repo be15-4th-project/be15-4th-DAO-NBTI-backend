@@ -39,4 +39,8 @@ public class User {
         this.point += 1;
     }
 
+    public void usePoint() {
+        this.point -= 5;
+    }
+
 }

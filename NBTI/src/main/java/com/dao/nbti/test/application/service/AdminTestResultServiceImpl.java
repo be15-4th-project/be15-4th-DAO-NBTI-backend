@@ -3,7 +3,7 @@ package com.dao.nbti.test.application.service;
 import com.dao.nbti.common.exception.ErrorCode;
 import com.dao.nbti.problem.domain.aggregate.Category;
 import com.dao.nbti.problem.domain.repository.CategoryRepository;
-import com.dao.nbti.test.application.dto.request.TestResultSearchCondition;
+import com.dao.nbti.test.application.dto.request.AdminTestResultSearchCondition;
 import com.dao.nbti.test.application.dto.response.*;
 import com.dao.nbti.test.domain.aggregate.TestResult;
 import com.dao.nbti.test.domain.repository.TestRepositoryCustom;
@@ -11,43 +11,45 @@ import com.dao.nbti.test.domain.repository.TestResultRepository;
 import com.dao.nbti.test.exception.TestException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Service
+@Repository
 @RequiredArgsConstructor
-public class TestResultServiceImpl implements TestResultService {
-
+public class AdminTestResultServiceImpl implements AdminTestResultService{
     private final TestResultRepository testResultRepository;
     private final CategoryRepository categoryRepository;
     private final TestRepositoryCustom testRepositoryCustom;
     private final ModelMapper modelMapper;
 
-    @Override
-    public Page<TestResultSummaryResponse> getTestResultList(TestResultSearchCondition condition, Pageable pageable) {
-        Page<TestResult> results = testResultRepository.findByUserAndCondition(
-                condition.getUserId(),
-                condition.getYear(),
-                condition.getMonth(),
-                pageable
-        );
 
-        return results.map(this::toSummaryResponse);
+    @Override
+    public AdminTestResultSummaryResponse getAdminTestResultList(AdminTestResultSearchCondition condition, Pageable pageable) {
+        List<AccountTestResultDto> results = testRepositoryCustom.getTest(condition,pageable);
+        List<AdminTestResultSummaryDTO> content = results.stream()
+                .map(dto -> {
+                    AdminTestResultSummaryDTO adminTestResultSummaryDTO= modelMapper.map(
+                            toSummaryResponse(dto.getTestResult()), AdminTestResultSummaryDTO.class
+                    );
+                    adminTestResultSummaryDTO.setAccountId(dto.getAccountId());
+                    return adminTestResultSummaryDTO;
+                }).toList();
+        long total = testRepositoryCustom.countTest(condition);
+        return new AdminTestResultSummaryResponse(new PageImpl<>(content, pageable, total));
     }
 
     @Override
-    public TestResultDetailResponse getTestResultDetail(int testResultId, int userId) {
-        TestResult result = testResultRepository.findByTestResultIdAndUserId(testResultId, userId)
+    public TestResultDetailResponse getTestResultDetail(int testResultId) {
+        TestResult testResult = testResultRepository.findByTestResultId(testResultId)
                 .orElseThrow(() -> new TestException(ErrorCode.TEST_RESULT_NOT_FOUND));
 
-        return toDetailResponse(result);
+        return toDetailResponse(testResult);
     }
-
 
     private TestResultSummaryResponse toSummaryResponse(TestResult result) {
         int[] scores = {

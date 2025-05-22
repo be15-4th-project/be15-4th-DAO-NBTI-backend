@@ -19,7 +19,7 @@ import java.time.Duration;
 public class AuthController {
     private final AuthService authService;
     @Operation(summary = "로그인", description = "accountId와 password을 입력받아 로그인하고 토큰을 발급받는다.")
-    @GetMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(@RequestBody LoginRequest loginRequest){
         LoginResponse response = authService.login(loginRequest);
         ResponseCookie cookie = createRefreshTokenCookie(response.getRefreshToken());
