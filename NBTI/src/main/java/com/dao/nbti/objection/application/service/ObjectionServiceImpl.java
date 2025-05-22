@@ -9,8 +9,10 @@ import com.dao.nbti.objection.domain.aggregate.Objection;
 import com.dao.nbti.objection.domain.aggregate.Status;
 import com.dao.nbti.objection.domain.repository.ObjectionRepository;
 import com.dao.nbti.objection.exception.ObjectionException;
+import com.dao.nbti.problem.domain.aggregate.Category;
 import com.dao.nbti.problem.domain.aggregate.IsDeleted;
 import com.dao.nbti.problem.domain.aggregate.Problem;
+import com.dao.nbti.problem.domain.repository.CategoryRepository;
 import com.dao.nbti.problem.domain.repository.ProblemRepository;
 import com.dao.nbti.study.domain.repository.StudyResultRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,20 +31,49 @@ public class ObjectionServiceImpl implements ObjectionService {
     private final ObjectionRepository objectionRepository;
     private final ProblemRepository problemRepository;
     private final StudyResultRepository studyResultRepository;
+    private final CategoryRepository categoryRepository;
 
     @Override
-    public Page<ObjectionSummaryResponse> getObjectionsByUser(int userId, Status status, Pageable pageable) {
+    public Page<ObjectionSummaryResponse> getObjectionsByUser(int userId, Status status, Integer parentCategoryId, Pageable pageable) {
         Page<Objection> objections = (status == null)
                 ? objectionRepository.findByUserId(userId, pageable)
                 : objectionRepository.findByUserIdAndStatus(userId, status, pageable);
 
-        return objections.map(o -> ObjectionSummaryResponse.builder()
-                .objectionId(o.getObjectionId())
-                .problemId(o.getProblemId())
-                .status(o.getStatus())
-                .createdAt(o.getCreatedAt())
-                .build());
+        return objections
+                .stream()
+                .filter(objection -> {
+                    if (parentCategoryId == null) return true;
+
+                    Problem problem = problemRepository.findById(objection.getProblemId())
+                            .orElseThrow(() -> new ObjectionException(ErrorCode.PROBLEM_NOT_FOUND));
+
+                    Category subCategory = categoryRepository.findById(problem.getCategoryId())
+                            .orElseThrow(() -> new ObjectionException(ErrorCode.CATEGORY_NOT_FOUND));
+
+                    return parentCategoryId.equals(subCategory.getParentCategoryId());
+                })
+                .map(objection -> {
+                    Problem problem = problemRepository.findById(objection.getProblemId()).get();
+                    Category subCategory = categoryRepository.findById(problem.getCategoryId()).get();
+                    Category parentCategory = categoryRepository.findById(subCategory.getParentCategoryId()).get();
+
+                    return ObjectionSummaryResponse.builder()
+                            .objectionId(objection.getObjectionId())
+                            .problemId(objection.getProblemId())
+                            .reason(objection.getReason())
+                            .parentCategoryName(parentCategory.getName())
+                            .status(objection.getStatus())
+                            .createdAt(objection.getCreatedAt())
+                            .build();
+                })
+                .collect(Collectors.collectingAndThen(Collectors.toList(), list -> {
+                    int start = (int) pageable.getOffset();
+                    int end = Math.min((start + pageable.getPageSize()), list.size());
+                    return new org.springframework.data.domain.PageImpl<>(list.subList(start, end), pageable, list.size());
+                }));
     }
+
+
 
     @Override
     public ObjectionDetailResponse getObjectionDetail(int objectionId, int userId) {
@@ -98,3 +130,6 @@ public class ObjectionServiceImpl implements ObjectionService {
                 .build();
     }
 }
+
+
+

@@ -40,6 +40,7 @@ public class StudyResultServiceImpl implements StudyResultService {
                 condition.getUserId(),
                 condition.getYear(),
                 condition.getMonth(),
+                condition.getParentCategoryId(),
                 pageable
         );
 
@@ -99,10 +100,12 @@ public class StudyResultServiceImpl implements StudyResultService {
         List<StudyProblemDetail> problems = studyResults.stream().map(sr -> {
             Problem p = problemMap.get(sr.getProblemId());
             return StudyProblemDetail.builder()
+                    .problemId(p.getProblemId())
                     .imageUrl(p.getContentImageUrl())
                     .correctAnswer(p.getCorrectAnswer())
                     .userAnswer(sr.getAnswer())
                     .isCorrect(sr.getIsCorrect() == IsCorrect.Y)
+                    .level(p.getLevel())
                     .build();
         }).toList();
 
@@ -115,3 +118,8 @@ public class StudyResultServiceImpl implements StudyResultService {
     }
 
 }
+
+
+
+
+
