@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
     @Operation(summary = "회원가입", description = "사용자는 사용자 정보를 입력하여 회원가입 할 수 있다.")
-    @GetMapping("/signup")
+    @PostMapping("/signup")
     public ResponseEntity<ApiResponse<Void>> signup(@RequestBody @Valid UserCreateRequest userCreateRequest){
         userService.createUser(userCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(null));
