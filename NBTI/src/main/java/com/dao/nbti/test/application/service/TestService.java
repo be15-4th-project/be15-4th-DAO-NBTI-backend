@@ -16,7 +16,6 @@ public interface TestService {
     TestResultDetailResponse getTestResult(int testResultId);
 
     // 검사 결과 마이페이지에 저장하기
-    void updateTestResult(Integer userId);
-
+    void updateTestResult(Integer userId, int testResultId);
 
 }

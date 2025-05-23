@@ -322,7 +322,7 @@ public class TestServiceImpl implements TestService {
 
     /* 마이페이지에 검사 결과 저장하기*/
     @Transactional
-    public void updateTestResult(Integer userId) {
+    public void updateTestResult(Integer userId, int testResultId) {
 
         // userId 가져오기 (로그인 된 user의 Id)
         // user가 있는지 확인하기
@@ -332,10 +332,17 @@ public class TestServiceImpl implements TestService {
         log.info("userId: {}", user.getUserId());
 
         // 검사 결과 가져오기
-        TestResult testResult = testResultRepository.findLatestByUserId(userId)
+        TestResult testResult = testResultRepository.findById(testResultId)
                 .orElseThrow(() -> new TestException(ErrorCode.TEST_RESULT_NOT_FOUND));
+
+        // 본인의 검사 결과인지 확인하기
+        if (!testResult.getUserId().equals(userId)) {
+            log.info("본인의 검사 결과가 아닙니다. " );
+            throw new TestException(ErrorCode.NOT_YOUR_RESULT);
+        }
 
         // 검사 결과 수정하기
         testResult.saveToMyPage();
     }
+
 }
