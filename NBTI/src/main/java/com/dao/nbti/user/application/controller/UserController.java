@@ -73,7 +73,11 @@ public class UserController {
             @RequestParam(required = false) String accountId,
             @RequestParam(required = false) String isDeleted,
             @PageableDefault(sort="userId") Pageable pageable){
-        UserSearchCondition condition = new UserSearchCondition(accountId,IsDeleted.valueOf(isDeleted));
+        IsDeleted deletedEnum = null;
+        if (isDeleted != null) {
+            deletedEnum = IsDeleted.valueOf(isDeleted);
+        }
+        UserSearchCondition condition = new UserSearchCondition(accountId,deletedEnum);
         UserAdminViewResponse response = userService.getUserList(condition, pageable);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
