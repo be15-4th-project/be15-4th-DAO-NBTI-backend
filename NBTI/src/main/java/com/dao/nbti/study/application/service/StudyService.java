@@ -182,7 +182,9 @@ public class StudyService {
     @Transactional(readOnly = true)
     public StudySummaryListResponseDto getStudySummaries(StudySearchRequestDto request) {
         List<StudySummaryDto> list = studyRepositoryCustom.getStudySummaries(request);
+        list.forEach(dto -> System.out.println(dto.getStudyId()));
         long total = studyRepositoryCustom.countStudySummaries(request);
+        System.out.println(total);
 
         return StudySummaryListResponseDto.builder()
                 .studies(list)

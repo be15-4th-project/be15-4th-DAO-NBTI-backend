@@ -21,22 +21,21 @@ public class StudyRepositoryImpl implements StudyRepositoryCustom {
     public List<StudySummaryDto> getStudySummaries(StudySearchRequestDto request) {
         String baseQuery = """
             SELECT new com.dao.nbti.study.application.dto.response.StudySummaryDto(
-                s.studyId, s.userId, s.createdAt, pc.name, COUNT(sr)
+                s.studyId, s.userId, u.accountId, s.createdAt, pc.name, COUNT(sr)
             )
             FROM Study s
+            JOIN User u ON s.userId = u.userId
             JOIN StudyResult sr ON sr.studyId = s.studyId
             JOIN Problem p ON p.problemId = sr.problemId
             JOIN Category c ON p.categoryId = c.categoryId
             LEFT JOIN Category pc ON c.parentCategoryId = pc.categoryId
-            WHERE sr.isCorrect = :isCorrect
-            AND p.isDeleted = :isDeleted
+            WHERE p.isDeleted = :isDeleted
         """;
 
         String jpql = buildQuery(baseQuery, request);
 
         TypedQuery<StudySummaryDto> query = em.createQuery(jpql + " GROUP BY s.studyId, s.userId, s.createdAt, pc.name", StudySummaryDto.class);
 
-        query.setParameter("isCorrect", IsCorrect.Y);
         query.setParameter("isDeleted", IsDeleted.N);
         setParams(query, request);
 
@@ -54,15 +53,13 @@ public class StudyRepositoryImpl implements StudyRepositoryCustom {
             JOIN Problem p ON p.problemId = sr.problemId
             JOIN Category c ON p.categoryId = c.categoryId
             LEFT JOIN Category pc ON c.parentCategoryId = pc.categoryId
-            WHERE sr.isCorrect = :isCorrect
-            AND p.isDeleted = :isDeleted
+            WHERE p.isDeleted = :isDeleted
         """;
 
         String jpql = buildQuery(baseQuery, request);
 
         TypedQuery<Long> query = em.createQuery(jpql, Long.class);
 
-        query.setParameter("isCorrect", IsCorrect.Y);
         query.setParameter("isDeleted", IsDeleted.N);
         setParams(query, request);
 
