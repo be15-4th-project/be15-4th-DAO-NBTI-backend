@@ -26,6 +26,7 @@ public interface TestResultRepository extends JpaRepository<TestResult, Integer>
         AND t.isSaved = com.dao.nbti.test.domain.aggregate.IsSaved.Y
         AND (:year IS NULL OR FUNCTION('YEAR', t.createdAt) = :year)
         AND (:month IS NULL OR FUNCTION('MONTH', t.createdAt) = :month)
+        ORDER BY t.createdAt DESC
     """)
     Page<TestResult> findByUserAndCondition(
             @Param("userId") int userId,
