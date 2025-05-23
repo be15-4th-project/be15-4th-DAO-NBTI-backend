@@ -60,7 +60,7 @@ public class AuthController {
     }
 
     @Operation(summary = "비밀번호 찾기", description = "사용자는 아이디와 이름을 입력하여 비밀번호 변경을 요청한다.")
-    @GetMapping("/find-password")
+    @PostMapping("/find-password")
     public ResponseEntity<ApiResponse<TokenResponse>> requestPasswordReset(@RequestBody PasswordFindRequest request){
         TokenResponse response = authService.findPassword(request);
 
@@ -69,7 +69,7 @@ public class AuthController {
     }
 
     @Operation(summary = "비밀번호 재설정", description = "사용자의 이름과 아이디 정보가 일치할 시 비밀번호를 재설정한다.")
-    @GetMapping("/reset-password")
+    @PostMapping("/reset-password")
     public ResponseEntity<ApiResponse<Void>> resetPassword(@RequestBody @Valid PasswordResetRequest request, @AuthenticationPrincipal UserDetails userDetails){
         authService.resetPassword(request, userDetails.getUsername());
 
