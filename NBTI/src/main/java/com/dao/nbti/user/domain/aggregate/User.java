@@ -22,7 +22,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Gender gender;
     private LocalDate birthdate;
-    private int point = 0;
+    private int point = 5;
     private String aiText=null;
     @Enumerated(EnumType.STRING)
     private Authority authority = Authority.USER;
