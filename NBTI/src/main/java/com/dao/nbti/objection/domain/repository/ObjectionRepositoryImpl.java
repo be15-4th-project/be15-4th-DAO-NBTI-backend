@@ -18,10 +18,12 @@ public class ObjectionRepositoryImpl implements ObjectionRepositoryCustom {
     public List<AdminObjectionDTO> getObjections(AdminObjectionSearchRequest request) {
         String initQuery = """
         SELECT new com.dao.nbti.objection.application.dto.response.AdminObjectionDTO(
-            o.userId, u.accountId, o.objectionId, o.problemId, o.status, o.createdAt
+            o.userId,
+            CASE WHEN u IS NULL OR u.isDeleted = com.dao.nbti.user.domain.aggregate.IsDeleted.Y THEN '삭제된 유저' ELSE u.accountId END
+            , o.objectionId, o.problemId, o.status, o.createdAt
         )
         FROM Objection o
-        JOIN User u ON u.userId = o.userId
+        LEFT JOIN User u ON u.userId = o.userId
         WHERE 1 = 1
         """;
         String jpql = getDynamicQuery(initQuery, request);
@@ -49,7 +51,7 @@ public class ObjectionRepositoryImpl implements ObjectionRepositoryCustom {
         String initQuery = """
         SELECT COUNT(o)
         FROM Objection o
-        JOIN User u ON u.userId = o.userId
+        LEFT JOIN User u ON u.userId = o.userId
         WHERE 1 = 1
         """;
         String jpql = getDynamicQuery(initQuery, request);
