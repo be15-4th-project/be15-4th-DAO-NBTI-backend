@@ -24,6 +24,7 @@ public class StudyResultDetailResponseDto {
         private String contentImageUrl;
         private boolean isCorrect;
         private int level;
+        private String correctAnswer;
         private String submittedAnswer;
         private String parentCategoryName;
     }
