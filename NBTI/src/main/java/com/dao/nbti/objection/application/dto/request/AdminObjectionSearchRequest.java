@@ -1,6 +1,7 @@
 package com.dao.nbti.objection.application.dto.request;
 
 import com.dao.nbti.objection.domain.aggregate.Status;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,10 +23,11 @@ public class AdminObjectionSearchRequest {
     @Schema(description = "처리 상태", example = "PENDING")
     private Status status;
 
+    @Schema(hidden = true)
     public int getOffset() {
         return (getPage() - 1) * getSize();
     }
-
+    @Schema(hidden = true)
     public int getLimit() {
         return getSize();
     }

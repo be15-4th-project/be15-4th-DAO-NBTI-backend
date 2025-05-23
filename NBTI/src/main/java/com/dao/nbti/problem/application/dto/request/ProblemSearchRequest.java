@@ -21,10 +21,11 @@ public class ProblemSearchRequest {
     @Schema(description = "난이도", example="1")
     Integer level;
 
+    @Schema(hidden = true)
     public int getOffset() {
         return (getPage() - 1) * getSize();
     }
-
+    @Schema(hidden = true)
     public int getLimit() {
         return getSize();
     }
