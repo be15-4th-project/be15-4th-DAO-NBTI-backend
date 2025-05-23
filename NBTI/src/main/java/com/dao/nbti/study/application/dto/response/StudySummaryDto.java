@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 public class StudySummaryDto {
     private int studyId;
     private int userId;
+    private String accountId;
     private LocalDateTime createdAt;
     private String parentCategoryName;
     private long correctCount;
