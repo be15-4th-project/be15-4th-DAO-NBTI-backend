@@ -2,12 +2,14 @@ package com.dao.nbti.study.application.dto.request;
 
 import jakarta.validation.constraints.Min;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
 @Getter
+@Setter
 @ToString
 public class StudySearchRequestDto {
     @Min(value = 1, message = "사용자 번호는 1 이상이어야 합니다.")
