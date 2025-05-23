@@ -38,7 +38,10 @@ public class AdminProblemController {
 
     @GetMapping("/{problemId}")
     @Operation(summary = "문제 상세 조회", description = "관리자가 서비스에 등록된 문제 세부 내용을 조회합니다.")
-    public ResponseEntity<ApiResponse<ProblemDetailsResponse>> getProblemDetails(@PathVariable int problemId) {
+    public ResponseEntity<ApiResponse<ProblemDetailsResponse>> getProblemDetails(
+            @Parameter(description = "문제 ID", example = "10")
+            @PathVariable int problemId
+    ) {
 
         return ResponseEntity.ok(ApiResponse.success(adminProblemService.getProblemDetails(problemId)));
     }
@@ -57,10 +60,11 @@ public class AdminProblemController {
     }
 
     @PutMapping(value = "/{problemId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "문제 수정", description = "관리자가 서비스에 등록된 문제를 수정합니다. 이미지를 새로 첨부하면 교체되고, 아니면 기존 이미지 유지됩니다." )
+    @Operation(summary = "문제 수정", description = "관리자가 서비스에 등록된 문제를 수정합니다. 이미지를 새로 첨부하면 교체되고, 아니면 기존 이미지 유지됩니다.")
     public ResponseEntity<ApiResponse<ProblemDetailsResponse>> updateProblem(
             @RequestPart @Validated ProblemUpdateRequest problemUpdateRequest,
             @RequestPart(value = "imageFile", required = false) MultipartFile imageFile,
+            @Parameter(description = "문제 ID", example = "10")
             @PathVariable int problemId
     ) {
         return ResponseEntity.ok(ApiResponse.success(
@@ -71,7 +75,10 @@ public class AdminProblemController {
 
     @DeleteMapping("/{problemId}")
     @Operation(summary = "문제 삭제", description = "관리자가 서비스에 등록된 문제를 삭제합니다.")
-    public ResponseEntity<ApiResponse<ProblemDeleteResponse>> deleteProblem(@PathVariable int problemId) {
+    public ResponseEntity<ApiResponse<ProblemDeleteResponse>> deleteProblem(
+            @Parameter(description = "문제 ID", example = "10")
+            @PathVariable int problemId
+    ) {
 
         return ResponseEntity.ok(ApiResponse.success(adminProblemService.deleteProblem(problemId)));
     }

@@ -1,6 +1,7 @@
 package com.dao.nbti.objection.application.dto.request;
 
 import com.dao.nbti.objection.domain.aggregate.Status;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,11 +10,16 @@ import lombok.Setter;
 @Setter
 @Builder
 public class AdminObjectionSearchRequest {
+    @Schema(description = "조회 페이지", example="2")
     private Integer page;
+    @Schema(description = "페이지 당 항목 수", example="10")
     private Integer size;
 
+    @Schema(description = "회원 계정 ID", example="user0001")
     private String accountId;
+    @Schema(description = "문제 ID", example = "10")
     private Integer problemId;
+    @Schema(description = "처리 상태", example = "PENDING")
     private Status status;
 
     public int getOffset() {
