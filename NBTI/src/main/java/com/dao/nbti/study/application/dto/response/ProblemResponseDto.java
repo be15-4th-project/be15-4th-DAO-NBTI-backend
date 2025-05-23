@@ -10,6 +10,7 @@ public class ProblemResponseDto {
     private int categoryId;
     private String categoryName;
     private int answerTypeId;
+    private String correctAnswer;
     private String answerTypeDescription;
     private String contentImageUrl;
     private int level;
