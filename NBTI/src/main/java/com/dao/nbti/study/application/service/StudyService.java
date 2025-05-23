@@ -73,6 +73,7 @@ public class StudyService {
                     .categoryId(p.getCategoryId())
                     .categoryName(category.getName())
                     .answerTypeId(p.getAnswerTypeId())
+                    .correctAnswer(p.getCorrectAnswer())
                     .answerTypeDescription(answerType.getDescription())
                     .contentImageUrl(p.getContentImageUrl())
                     .level(p.getLevel())
