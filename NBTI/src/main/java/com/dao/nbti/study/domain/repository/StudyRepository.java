@@ -25,6 +25,7 @@ public interface StudyRepository extends JpaRepository<Study, Integer> {
            AND (:month IS NULL OR FUNCTION('MONTH', s.createdAt) = :month)
            AND (:parentCategoryId IS NULL
                 OR pc.categoryId = :parentCategoryId)
+         ORDER BY s.createdAt DESC
     """)
     Page<Study> findByUserAndCondition(
             @Param("userId")           int      userId,
