@@ -24,7 +24,6 @@ import com.dao.nbti.user.domain.aggregate.PointType;
 import com.dao.nbti.user.domain.repository.PointHistoryRepository;
 import com.dao.nbti.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -160,6 +159,7 @@ public class StudyService {
                     .problemId(problem.getProblemId())
                     .isCorrect(result.getIsCorrect() == IsCorrect.Y)
                     .level(problem.getLevel())
+                    .correctAnswer(problem.getCorrectAnswer())
                     .submittedAnswer(result.getAnswer())
                     .parentCategoryName(parentCategory.getName())
                     .contentImageUrl(problem.getContentImageUrl())
