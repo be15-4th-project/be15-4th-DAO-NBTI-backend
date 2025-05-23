@@ -135,16 +135,27 @@ public class TestResultController {
     /* 검사 결과 제출 하기 */
     @PostMapping
     @Operation(summary = "검사 제출 및 채점", description = "제출된 검사 답안을 채점하고, 검사 결과를 생성 및 저장합니다. ")
-    public ResponseEntity<ApiResponse<Void>> submitAnswers(
+    public ResponseEntity<ApiResponse<Integer>> submitAnswers(
             @RequestBody @Valid TestSubmitRequest request,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         Integer userId = (userDetails != null) ? Integer.parseInt(userDetails.getUsername()) : null;
 
-        testService.submitTest(request, userId);
-        return ResponseEntity.ok(ApiResponse.success(null));
+        int testId = testService.submitTest(request, userId);
+        return ResponseEntity.ok(ApiResponse.success(testId));
     }
 
+    /* 검사 결과 조회 하기 */
+    @GetMapping("/now/{testResultId}")
+    @Operation(summary = "검사 결과 조회 하기", description = "검사 결과 아이디를 통해, 검사 결과를 조회합니다.")
+    public ResponseEntity<ApiResponse<TestResultDetailResponse>> submitAnswers(
+            @PathVariable int testResultId
+    ) {
+
+        TestResultDetailResponse testResultResponse = testService.getTestResult(testResultId);
+
+        return ResponseEntity.ok(ApiResponse.success(testResultResponse));
+    }
 
     /* 검사 결과 마이페이지에 저장하기 */
     @PutMapping("/my-page")
@@ -162,4 +173,5 @@ public class TestResultController {
 
         return ResponseEntity.ok(ApiResponse.success(null));
     }
+
 }

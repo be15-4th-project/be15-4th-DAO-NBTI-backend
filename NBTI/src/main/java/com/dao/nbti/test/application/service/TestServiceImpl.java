@@ -11,10 +11,12 @@ import com.dao.nbti.study.exception.NoSuchAnswerTypeException;
 import com.dao.nbti.study.exception.NoSuchCategoryException;
 import com.dao.nbti.study.exception.ProblemNotFoundException;
 import com.dao.nbti.test.application.dto.request.TestAnswerDTO;
+import com.dao.nbti.test.application.dto.response.CategoryScoreDetail;
 import com.dao.nbti.test.application.dto.response.TestProblemListResponse;
 import com.dao.nbti.test.application.dto.response.TestResponse;
 import com.dao.nbti.test.application.dto.request.TestResultCreateRequest;
 import com.dao.nbti.test.application.dto.request.TestSubmitRequest;
+import com.dao.nbti.test.application.dto.response.TestResultDetailResponse;
 import com.dao.nbti.test.domain.aggregate.IsCorrect;
 import com.dao.nbti.test.domain.aggregate.TestProblem;
 import com.dao.nbti.test.domain.aggregate.TestResult;
@@ -108,7 +110,7 @@ public class TestServiceImpl implements TestService {
 
     /* 검사 채점 하고 문제와 그 결과 저장하기 */
     @Transactional
-    public void submitTest(TestSubmitRequest request, Integer userId) {
+    public int submitTest(TestSubmitRequest request, Integer userId) {
 
         // 회원인 경우에는 포인트 차감하기 (point 검사는 위에서 수행했음)
         if(userId != null) {
@@ -169,6 +171,8 @@ public class TestServiceImpl implements TestService {
 
         // 캐시 삭제
         problemRedisTemplate.delete(key);
+
+        return resultId;
     }
 
 
@@ -272,6 +276,47 @@ public class TestServiceImpl implements TestService {
                 .workMemory(work)
                 .procSpeed(proc)
                 .spatialPerception(spatial)
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public TestResultDetailResponse getTestResult(int testResultId){
+
+        TestResult testResult = testResultRepository.findByTestResultId(testResultId)
+                .orElseThrow(() -> new TestException(ErrorCode.TEST_RESULT_NOT_FOUND));
+
+        return toDetailResponse(testResult);
+    }
+
+    private TestResultDetailResponse toDetailResponse(TestResult result) {
+        List<String> categoryNames = List.of(
+                "언어 이해", "시사 상식", "지각 추론", "작업 기억", "처리 속도", "공간 지각력"
+        );
+
+        Map<String, String> descriptionMap = categoryRepository.findAll().stream()
+                .filter(c -> c.getParentCategoryId() == null && categoryNames.contains(c.getName()))
+                .collect(Collectors.toMap(Category::getName, Category::getDescription));
+
+        List<CategoryScoreDetail> scores = List.of(
+                newScoreDetail("언어 이해", result.getLangComp(), descriptionMap),
+                newScoreDetail("시사 상식", result.getGeneralKnowledge(), descriptionMap),
+                newScoreDetail("지각 추론", result.getPercReason(), descriptionMap),
+                newScoreDetail("작업 기억", result.getWorkMemory(), descriptionMap),
+                newScoreDetail("처리 속도", result.getProcSpeed(), descriptionMap),
+                newScoreDetail("공간 지각력", result.getSpatialPerception(), descriptionMap)
+        );
+
+        return TestResultDetailResponse.builder()
+                .scores(scores)
+                .aiText(result.getAiText())
+                .build();
+    }
+
+    private CategoryScoreDetail newScoreDetail(String name, int score, Map<String, String> descMap) {
+        return CategoryScoreDetail.builder()
+                .categoryName(name)
+                .description(descMap.getOrDefault(name, ""))
+                .score(score)
                 .build();
     }
 
