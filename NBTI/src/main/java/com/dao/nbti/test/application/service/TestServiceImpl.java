@@ -11,12 +11,9 @@ import com.dao.nbti.study.exception.NoSuchAnswerTypeException;
 import com.dao.nbti.study.exception.NoSuchCategoryException;
 import com.dao.nbti.study.exception.ProblemNotFoundException;
 import com.dao.nbti.test.application.dto.request.TestAnswerDTO;
-import com.dao.nbti.test.application.dto.response.CategoryScoreDetail;
-import com.dao.nbti.test.application.dto.response.TestProblemListResponse;
-import com.dao.nbti.test.application.dto.response.TestResponse;
+import com.dao.nbti.test.application.dto.response.*;
 import com.dao.nbti.test.application.dto.request.TestResultCreateRequest;
 import com.dao.nbti.test.application.dto.request.TestSubmitRequest;
-import com.dao.nbti.test.application.dto.response.TestResultDetailResponse;
 import com.dao.nbti.test.domain.aggregate.IsCorrect;
 import com.dao.nbti.test.domain.aggregate.TestProblem;
 import com.dao.nbti.test.domain.aggregate.TestResult;
@@ -280,15 +277,15 @@ public class TestServiceImpl implements TestService {
     }
 
     @Transactional(readOnly = true)
-    public TestResultDetailResponse getTestResult(int testResultId){
+    public TestResultResponse getTestResult(int testResultId){
 
         TestResult testResult = testResultRepository.findByTestResultId(testResultId)
                 .orElseThrow(() -> new TestException(ErrorCode.TEST_RESULT_NOT_FOUND));
 
-        return toDetailResponse(testResult);
+        return toDetailResponse(testResult, testResult.getUserId());
     }
 
-    private TestResultDetailResponse toDetailResponse(TestResult result) {
+    private TestResultResponse toDetailResponse(TestResult result, Integer userId) {
         List<String> categoryNames = List.of(
                 "언어 이해", "시사 상식", "지각 추론", "작업 기억", "처리 속도", "공간 지각력"
         );
@@ -306,7 +303,8 @@ public class TestServiceImpl implements TestService {
                 newScoreDetail("공간 지각력", result.getSpatialPerception(), descriptionMap)
         );
 
-        return TestResultDetailResponse.builder()
+        return TestResultResponse.builder()
+                .userId(userId)
                 .scores(scores)
                 .aiText(result.getAiText())
                 .build();
