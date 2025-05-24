@@ -2,7 +2,6 @@ package com.dao.nbti.test.application.service;
 
 import com.dao.nbti.test.application.dto.request.TestSubmitRequest;
 import com.dao.nbti.test.application.dto.response.TestProblemListResponse;
-import com.dao.nbti.test.application.dto.response.TestResultDetailResponse;
 import com.dao.nbti.test.application.dto.response.TestResultResponse;
 
 public interface TestService {
