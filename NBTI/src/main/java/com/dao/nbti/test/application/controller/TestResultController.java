@@ -8,6 +8,7 @@ import com.dao.nbti.test.application.dto.request.TestSubmitRequest;
 import com.dao.nbti.test.application.dto.response.AdminTestResultSummaryResponse;
 import com.dao.nbti.test.application.dto.response.TestResultDetailResponse;
 import com.dao.nbti.test.application.dto.request.TestResultSearchCondition;
+import com.dao.nbti.test.application.dto.response.TestResultResponse;
 import com.dao.nbti.test.application.dto.response.TestResultSummaryResponse;
 import com.dao.nbti.test.application.service.AdminTestResultService;
 import com.dao.nbti.test.application.service.TestResultService;
@@ -148,11 +149,11 @@ public class TestResultController {
     /* 검사 결과 조회 하기 */
     @GetMapping("/now/{testResultId}")
     @Operation(summary = "검사 결과 조회 하기", description = "검사 결과 아이디를 통해, 검사 결과를 조회합니다.")
-    public ResponseEntity<ApiResponse<TestResultDetailResponse>> submitAnswers(
+    public ResponseEntity<ApiResponse<TestResultResponse>> submitAnswers(
             @PathVariable int testResultId
     ) {
 
-        TestResultDetailResponse testResultResponse = testService.getTestResult(testResultId);
+        TestResultResponse testResultResponse = testService.getTestResult(testResultId);
 
         return ResponseEntity.ok(ApiResponse.success(testResultResponse));
     }

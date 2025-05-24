@@ -2,7 +2,7 @@ package com.dao.nbti.test.application.service;
 
 import com.dao.nbti.test.application.dto.request.TestSubmitRequest;
 import com.dao.nbti.test.application.dto.response.TestProblemListResponse;
-import com.dao.nbti.test.application.dto.response.TestResultDetailResponse;
+import com.dao.nbti.test.application.dto.response.TestResultResponse;
 
 public interface TestService {
 
@@ -13,7 +13,7 @@ public interface TestService {
     int submitTest(TestSubmitRequest request, Integer userId);
 
     // 검사 결과 조회하기
-    TestResultDetailResponse getTestResult(int testResultId);
+    TestResultResponse getTestResult(int testResultId);
 
     // 검사 결과 마이페이지에 저장하기
     void updateTestResult(Integer userId, int testResultId);
