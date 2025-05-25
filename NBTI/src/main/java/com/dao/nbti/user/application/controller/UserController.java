@@ -32,9 +32,9 @@ public class UserController {
 
     @Operation(summary = "회원 탈퇴", description = "회원 탈퇴 시 데이터 익명화 및 계정 비활성화 처리한다.")
     @DeleteMapping("/withdraw")
-    public ResponseEntity<ApiResponse<Void>> withdraw(@AuthenticationPrincipal User user){
+    public ResponseEntity<ApiResponse<Void>> withdraw(@AuthenticationPrincipal User user, @RequestBody UserDeleteRequest userDeleteRequest){
         Integer userId = Integer.parseInt(user.getUsername());
-        userService.deleteUser(userId);
+        userService.deleteUser(userId,userDeleteRequest);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
@@ -42,7 +42,6 @@ public class UserController {
     @GetMapping("/id-duplicate")
     public ResponseEntity<ApiResponse<IdDuplicateResponse>> idDuplicate(@RequestParam String accountId){
         IdDuplicateResponse response = userService.checkAccountId(accountId);
-
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 

@@ -3,6 +3,8 @@ package com.dao.nbti.common.auth.application.controller;
 import com.dao.nbti.common.auth.application.dto.*;
 import com.dao.nbti.common.auth.application.service.AuthService;
 import com.dao.nbti.common.dto.ApiResponse;
+import com.dao.nbti.common.exception.ErrorCode;
+import com.dao.nbti.user.exception.UserException;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -95,5 +97,13 @@ public class AuthController {
                 .maxAge(0)
                 .sameSite("Strict")
                 .build();
+    }
+
+    @ExceptionHandler(UserException.class)
+    public ResponseEntity<ApiResponse<Void>> handleUserException(UserException e) {
+        ErrorCode errorCode = e.getErrorCode();
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(ApiResponse.failure(errorCode.getCode(), errorCode.getMessage()));
     }
 }

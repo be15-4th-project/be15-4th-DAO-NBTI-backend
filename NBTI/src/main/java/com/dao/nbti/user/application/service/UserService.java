@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,9 +41,14 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUser(Integer userId) {
+    public void deleteUser(Integer userId, UserDeleteRequest request) {
         User user = userRepository.findByUserIdAndDeletedAtIsNull(userId)
                 .orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND));
+        log.info("{}",user.getPassword());
+        log.info("{}",passwordEncoder.encode(request.getPassword()));
+        if(!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new UserException(ErrorCode.PASSWORD_DISCORD);
+        }
         user.delete();
     }
 

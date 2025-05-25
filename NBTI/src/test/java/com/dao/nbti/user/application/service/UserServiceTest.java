@@ -2,6 +2,7 @@ package com.dao.nbti.user.application.service;
 
 import com.dao.nbti.user.application.dto.IdDuplicateResponse;
 import com.dao.nbti.user.application.dto.UserCreateRequest;
+import com.dao.nbti.user.application.dto.UserDeleteRequest;
 import com.dao.nbti.user.domain.aggregate.Authority;
 import com.dao.nbti.user.domain.aggregate.Gender;
 import com.dao.nbti.user.domain.aggregate.User;
@@ -90,16 +91,23 @@ class UserServiceTest {
 
     @Test
     void deleteUser() {
+        UserDeleteRequest request = UserDeleteRequest.builder()
+                .password("password01@")
+                .build();
         when(userRepository.findByUserIdAndDeletedAtIsNull(userId)).thenReturn(Optional.of(user));
-
-        userService.deleteUser(userId);
+        when(passwordEncoder.encode("password01@")).thenReturn("encodedPassword");
+        when(passwordEncoder.matches(any(),any())).thenReturn(true);
+        userService.deleteUser(userId,request);
     }
 
     @Test
     void deleteUser_userNotFound(){
+        UserDeleteRequest request = UserDeleteRequest.builder()
+                .password("password01@")
+                .build();
         when(userRepository.findByUserIdAndDeletedAtIsNull(userId)).thenReturn(Optional.empty());
 
-        assertThrows(UserException.class ,()-> userService.deleteUser(userId));
+        assertThrows(UserException.class ,()-> userService.deleteUser(userId,request));
     }
 
     @Test
