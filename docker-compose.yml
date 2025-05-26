@@ -16,32 +16,6 @@ services:
     ports:
       - "6379:6379"
 
-  backend:
-    # 해당 디렉토리의 Dockerfile을 사용해 이미지를 빌드
-    build: ./NBTI
-    # 컨테이너 이름을 'backend'로 설정
-    container_name: backend
-    # 호스트의 8080 포트를 컨테이너의 8080 포트로 매핑
-    ports:
-      - "8080:8080"
-    depends_on:
-      - db
-      - elasticsearch
-      - logstash
-    environment:
-      - DB_URL=${DB_URL}
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PORT=${REDIS_PORT}
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-      - JWT_SECRET=${JWT_SECRET}
-      - JWT_EXPIRATION=${JWT_EXPIRATION}
-      - JWT_REFRESH_EXPIRATION=${JWT_REFRESH_EXPIRATION}
-      - API_KEY=${API_KEY}
-      - S3_ACCESS_KEY=${S3_ACCESS_KEY}
-      - S3_SECRET_KEY=${S3_SECRET_KEY}
-
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
     container_name: elasticsearch
