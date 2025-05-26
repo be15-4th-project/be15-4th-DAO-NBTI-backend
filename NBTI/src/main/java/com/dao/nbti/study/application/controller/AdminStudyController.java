@@ -26,6 +26,8 @@ public class AdminStudyController {
     @Operation(summary = "관리자 학습 내역 조회", description = "모든 학습 내역에 대해 상위 카테고리, 기간, 회원 ID 필터를 통해 조회")
     public ResponseEntity<ApiResponse<StudySummaryListResponseDto>> getStudyCategoryList(
             @ModelAttribute @Valid StudySearchRequestDto request
+
+
     ) {
         StudySummaryListResponseDto response = studyService.getStudySummaries(request);
         return ResponseEntity.ok(ApiResponse.success(response));
