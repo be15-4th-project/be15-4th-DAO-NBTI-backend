@@ -34,7 +34,7 @@ public class StudyRepositoryImpl implements StudyRepositoryCustom {
 
         String jpql = buildQuery(baseQuery, request);
 
-        TypedQuery<StudySummaryDto> query = em.createQuery(jpql + " GROUP BY s.studyId, s.userId, s.createdAt, pc.name", StudySummaryDto.class);
+        TypedQuery<StudySummaryDto> query = em.createQuery(jpql + " GROUP BY s.studyId, s.userId, u.accountId ,s.createdAt, pc.name", StudySummaryDto.class);
 
         query.setParameter("isDeleted", IsDeleted.N);
         setParams(query, request);
@@ -49,6 +49,7 @@ public class StudyRepositoryImpl implements StudyRepositoryCustom {
         String baseQuery = """
             SELECT COUNT(DISTINCT s)
             FROM Study s
+            JOIN User u ON s.userId = u.userId
             JOIN StudyResult sr ON sr.studyId = s.studyId
             JOIN Problem p ON p.problemId = sr.problemId
             JOIN Category c ON p.categoryId = c.categoryId
@@ -69,8 +70,8 @@ public class StudyRepositoryImpl implements StudyRepositoryCustom {
     private static String buildQuery(String base, StudySearchRequestDto request) {
         StringBuilder sb = new StringBuilder(base);
 
-        if (request.getUserId() != null) {
-            sb.append("\nAND s.userId = :userId");
+        if (request.getAccountId() != null) {
+            sb.append("\nAND u.accountId = :accountId");
         }
         if (request.getParentCategoryId() != null) {
             sb.append("\nAND pc.categoryId = :parentCategoryId");
@@ -86,7 +87,7 @@ public class StudyRepositoryImpl implements StudyRepositoryCustom {
     }
 
     private static void setParams(TypedQuery<?> query, StudySearchRequestDto request) {
-        if (request.getUserId() != null) query.setParameter("userId", request.getUserId());
+        if (request.getAccountId() != null) query.setParameter("accountId", request.getAccountId());
         if (request.getParentCategoryId() != null) query.setParameter("parentCategoryId", request.getParentCategoryId());
         if (request.getStartDate() != null) query.setParameter("startDate", request.getStartDate().atStartOfDay());
         if (request.getEndDate() != null) query.setParameter("endDate", request.getEndDate().plusDays(1).atStartOfDay());
