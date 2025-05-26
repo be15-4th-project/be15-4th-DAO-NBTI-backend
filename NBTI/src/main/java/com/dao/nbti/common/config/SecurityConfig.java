@@ -7,10 +7,12 @@ import com.dao.nbti.common.jwt.RestAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -43,8 +45,14 @@ public class SecurityConfig {
                         exception.authenticationEntryPoint(restAuthenticationEntryPoint) // 인증 실패
                                 .accessDeniedHandler(restAccessDeniedHandler)) // 인가 실패
                 .authorizeHttpRequests(
-                        auth -> auth
-                                .anyRequest().permitAll()
+                        auth -> {
+                            permitAllEndpoints(auth);
+//                            userEndpoints(auth);
+                            adminEndpoints(auth);
+
+                            // 이 외의 요청은 인증 필요
+                            auth.anyRequest().authenticated();
+                        }
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
@@ -75,4 +83,33 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", config);// 모든 경로에 대해 설정
         return source;
     }
+
+    // 인증 없이 접근 가능
+    private void permitAllEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
+        auths.requestMatchers(
+                "/user/login"
+        ).permitAll();
+    }
+//
+//    // 회눤 전용
+//    private void userEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
+//        auths.requestMatchers(
+//
+//        ).hasAuthority("USER");
+//    }
+
+    // 관리자 전용
+    private void adminEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
+        auths.requestMatchers(HttpMethod.GET, "/admin/problems/list").hasAuthority("ADMIN");
+        auths.requestMatchers(HttpMethod.GET, "/admin/problems/{problemId}").hasAuthority("ADMIN");
+        auths.requestMatchers(HttpMethod.POST, "/admin/problems").hasAuthority("ADMIN");
+        auths.requestMatchers(HttpMethod.PUT, "/admin/problems/{problemId}").hasAuthority("ADMIN");
+        auths.requestMatchers(HttpMethod.DELETE, "/admin/problems/{problemId}").hasAuthority("ADMIN");
+        auths.requestMatchers(HttpMethod.GET, "/admin/categories").hasAuthority("ADMIN");
+
+        auths.requestMatchers(HttpMethod.GET, "/admin/objections").hasAuthority("ADMIN");
+        auths.requestMatchers(HttpMethod.GET, "/admin/objections/{objectionId}").hasAuthority("ADMIN");
+        auths.requestMatchers(HttpMethod.PUT, "/admin/objections/{objectionId}").hasAuthority("ADMIN");
+    }
+
 }
