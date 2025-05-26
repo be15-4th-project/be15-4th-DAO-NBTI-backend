@@ -61,3 +61,12 @@ cloud:
       static: ap-northeast-2
     s3:
       bucket: dao-nbti
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
