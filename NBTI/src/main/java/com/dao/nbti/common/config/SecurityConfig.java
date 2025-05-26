@@ -87,6 +87,8 @@ public class SecurityConfig {
     // 인증 없이 접근 허용
     private void permitAllEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
         auths.requestMatchers(
+                "/swagger-ui/**",
+                "/v3/api-docs/**",
                 "/user/signup",
                 "/user/id-duplicate",
                 "/user/find-password",
