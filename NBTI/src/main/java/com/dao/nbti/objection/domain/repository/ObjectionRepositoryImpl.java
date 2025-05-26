@@ -26,7 +26,7 @@ public class ObjectionRepositoryImpl implements ObjectionRepositoryCustom {
         LEFT JOIN User u ON u.userId = o.userId
         WHERE 1 = 1
         """;
-        String jpql = getDynamicQuery(initQuery, request);
+        String jpql = getDynamicQuery(initQuery, request, true);
 
         TypedQuery<AdminObjectionDTO> query = em.createQuery(jpql, AdminObjectionDTO.class);
 
@@ -54,7 +54,7 @@ public class ObjectionRepositoryImpl implements ObjectionRepositoryCustom {
         LEFT JOIN User u ON u.userId = o.userId
         WHERE 1 = 1
         """;
-        String jpql = getDynamicQuery(initQuery, request);
+        String jpql = getDynamicQuery(initQuery, request, false);
 
         TypedQuery<Long> query = em.createQuery(jpql, Long.class);
         if (request.getAccountId() != null) {
@@ -70,7 +70,7 @@ public class ObjectionRepositoryImpl implements ObjectionRepositoryCustom {
         return query.getSingleResult();
     }
 
-    private static String getDynamicQuery(String str, AdminObjectionSearchRequest request) {
+    private static String getDynamicQuery(String str, AdminObjectionSearchRequest request, boolean isOrdered) {
         StringBuilder jpql = new StringBuilder(str);
 
         if (request.getAccountId() != null) {
@@ -82,6 +82,10 @@ public class ObjectionRepositoryImpl implements ObjectionRepositoryCustom {
         }
         if (request.getStatus() != null) {
             jpql.append("\nAND o.status = :status");
+        }
+
+        if (isOrdered) {
+            jpql.append("\nORDER BY o.createdAt ASC");
         }
         return jpql.toString();
     }
