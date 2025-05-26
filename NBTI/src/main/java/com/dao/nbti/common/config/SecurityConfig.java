@@ -7,7 +7,6 @@ import com.dao.nbti.common.jwt.RestAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -95,7 +94,8 @@ public class SecurityConfig {
                 "/test/problems",
                 "/test-result/now/**",
                 "/test-result",
-                "/study/category"
+                "/study/category",
+                "/actuator/**"
         ).permitAll();
 
         // 로그인 및 토큰 관련 (모두 허용)
