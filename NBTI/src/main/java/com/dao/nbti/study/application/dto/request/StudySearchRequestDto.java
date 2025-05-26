@@ -12,8 +12,8 @@ import java.time.LocalDate;
 @Setter
 @ToString
 public class StudySearchRequestDto {
-    @Min(value = 1, message = "사용자 번호는 1 이상이어야 합니다.")
-    private Integer userId;
+
+    private String accountId;
 
     @Min(value = 0, message = "카테고리 ID는 0 이상이어야 합니다.")
     private Integer parentCategoryId;
