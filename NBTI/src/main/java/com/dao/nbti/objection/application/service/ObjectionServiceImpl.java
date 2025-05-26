@@ -122,10 +122,10 @@ public class ObjectionServiceImpl implements ObjectionService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        objectionRepository.save(objection);
+        Objection saved = objectionRepository.save(objection);
 
         return ObjectionCreateResponse.builder()
-                .objectionId(objection.getObjectionId())
+                .objectionId(saved.getObjectionId())
                 .message("이의 제기가 등록되었습니다.")
                 .build();
     }
