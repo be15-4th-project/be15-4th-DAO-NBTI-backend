@@ -87,7 +87,8 @@ public class SecurityConfig {
     // 인증 없이 접근 가능
     private void permitAllEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
         auths.requestMatchers(
-                "/user/login"
+                "/user/login",
+                "/user/refresh"
         ).permitAll();
     }
 //
