@@ -46,7 +46,7 @@ public class SecurityConfig {
                                 .accessDeniedHandler(restAccessDeniedHandler)) // 인가 실패
                 .authorizeHttpRequests(
                         auth -> {
-//                            permitAllEndpoints(auth);
+                            permitAllEndpoints(auth);
 //                            userEndpoints(auth);
                             adminEndpoints(auth);
 
@@ -85,11 +85,11 @@ public class SecurityConfig {
     }
 
     // 인증 없이 접근 가능
-//    private void permitAllEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
-//        auths.requestMatchers(
-//
-//        ).permitAll();
-//    }
+    private void permitAllEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
+        auths.requestMatchers(
+                "/user/login"
+        ).permitAll();
+    }
 //
 //    // 회눤 전용
 //    private void userEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
