@@ -47,8 +47,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         auth -> {
                             permitAllEndpoints(auth);
-//                            userEndpoints(auth);
+                            userEndpoints(auth);
                             adminEndpoints(auth);
+                            commonEndpoints(auth);
 
                             // 이 외의 요청은 인증 필요
                             auth.anyRequest().authenticated();
@@ -84,33 +85,73 @@ public class SecurityConfig {
         return source;
     }
 
-    // 인증 없이 접근 가능
+    // 인증 없이 접근 허용
     private void permitAllEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
+        auths.requestMatchers(
+                "/user/signup",
+                "/user/id-duplicate",
+                "/user/find-password",
+                "/user/reset-password",
+                "/test/problems",
+                "/test-result/now/**",
+                "/test-result",
+                "/study/category"
+        ).permitAll();
+
+        // 로그인 및 토큰 관련 (모두 허용)
         auths.requestMatchers(
                 "/user/login",
                 "/user/refresh"
         ).permitAll();
     }
-//
-//    // 회눤 전용
-//    private void userEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
-//        auths.requestMatchers(
-//
-//        ).hasAuthority("USER");
-//    }
+
+    // 회원(로그인 사용자)만 접근 가능
+    private void userEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
+        auths.requestMatchers(
+                "/user/logout",
+                "/user/withdraw",
+                "/user/info",
+                "/user/points",
+
+                "/test-result/list",
+                "/test-result/{testResultId}",
+                "/test-result/{testResultId}/my-page",
+
+                "/mypage/studies",
+                "/mypage/studies/{studyId}",
+
+                "/mypage/objections",
+                "/mypage/objections/{objectionId}",
+
+                "/study/problem",
+                "/study/submit"
+        ).hasAuthority("USER");
+    }
 
     // 관리자 전용
     private void adminEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
-        auths.requestMatchers(HttpMethod.GET, "/admin/problems/list").hasAuthority("ADMIN");
-        auths.requestMatchers(HttpMethod.GET, "/admin/problems/{problemId}").hasAuthority("ADMIN");
-        auths.requestMatchers(HttpMethod.POST, "/admin/problems").hasAuthority("ADMIN");
-        auths.requestMatchers(HttpMethod.PUT, "/admin/problems/{problemId}").hasAuthority("ADMIN");
-        auths.requestMatchers(HttpMethod.DELETE, "/admin/problems/{problemId}").hasAuthority("ADMIN");
-        auths.requestMatchers(HttpMethod.GET, "/admin/categories").hasAuthority("ADMIN");
+        auths.requestMatchers(
+                "/user/list",
+                "/test-result/list/admin",
+                "/test-result/{testResultId}/admin",
+                "/admin/study",
 
-        auths.requestMatchers(HttpMethod.GET, "/admin/objections").hasAuthority("ADMIN");
-        auths.requestMatchers(HttpMethod.GET, "/admin/objections/{objectionId}").hasAuthority("ADMIN");
-        auths.requestMatchers(HttpMethod.PUT, "/admin/objections/{objectionId}").hasAuthority("ADMIN");
+                "/admin/problems/list",
+                "/admin/problems",
+                "/admin/problems/{problemId}",
+                "/admin/categories",
+
+                "/admin/objections",
+                "/admin/objections/{objectionId}"
+        ).hasAuthority("ADMIN");
     }
+
+    // 회원 + 관리자 모두 접근 가능
+    private void commonEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
+        auths.requestMatchers("/study/result/*")
+                .hasAnyAuthority("USER", "ADMIN");
+    }
+
+
 
 }
