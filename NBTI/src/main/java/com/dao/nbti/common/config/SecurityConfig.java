@@ -88,6 +88,7 @@ public class SecurityConfig {
     private void permitAllEndpoints(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auths) {
         auths.requestMatchers(
                 "/swagger-ui/**",
+                "/swagger-resources/**",
                 "/v3/api-docs/**",
                 "/user/signup",
                 "/user/id-duplicate",
