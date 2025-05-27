@@ -110,6 +110,7 @@ public class AuthService {
         jwtTokenProvider.validateToken(refreshToken);
         String userId = jwtTokenProvider.getUsernameFromJWT(refreshToken);
         redisTemplate.delete(userId);
+        log.info("{} + 가 로그아웃하였습니다.", userId);
     }
 
     @Transactional
