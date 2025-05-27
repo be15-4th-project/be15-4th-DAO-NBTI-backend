@@ -53,6 +53,8 @@ public class AuthService {
                 Duration.ofDays(7)
         );
 
+        log.info("{} + 가 로그인하였습니다.", user.getUserId());
+
         return LoginResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
