@@ -24,6 +24,7 @@ public class AdminCategoryController {
     public ResponseEntity<ApiResponse<CategoryResponse>> getCategories() {
 
         return ResponseEntity.ok(ApiResponse.success(adminProblemService.getCategories()));
+
     }
 
 }
